@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Master</title>
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script> 
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh; /* Full height for the body */
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #e0f7fa, #80deea); /* Gradient background */
+            color: #333;
+        }
+
+        header {
+            background-color: #00796b; /* Teal color */
+            padding: 15px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        header nav ul {
+            list-style-type: none;
+            display: flex;
+            justify-content: center;
+        }
+
+        header nav ul li {
+            margin: 0 20px;
+        }
+
+        header nav ul li a {
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+            transition: color 0.3s;
+        }
+
+        header nav ul li a:hover {
+            color: #ffeb3b; /* Highlight color */
+        }
+        main {
+            flex: 1; /* Make main take up remaining space */
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .content h1, .content h2 {
+            margin-bottom: 20px;
+            text-align: center;
+            color: #00796b; /* Teal color */
+        }
+
+        .quote {
+            font-size: 1.2rem;
+            text-align: center;
+            margin: 20px 0;
+            font-style: italic;
+            color: #555;
+        }
+
+        .quiz-list, .chapter-list {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .quiz-card, .chapter {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            width: 30%;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .quiz-card:hover, .chapter:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .quiz-card i, .chapter i {
+            font-size: 40px;
+            margin-bottom: 15px;
+            color: #00796b; /* Teal color */
+        }
+
+        .quiz-card h3 {
+            font-size: 1.25rem;
+            margin-bottom: 10px;
+        }
+
+        .quiz-card p {
+            font-size: 1rem;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            background-color: #00796b; /* Teal color */
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: #004d40; /* Darker teal */
+        }
+
+
+        footer {
+            background-color: #00796b; /* Teal color */
+            color: white;
+            text-align: center;
+            padding: 15px 0;
+        }
+
+        footer p {
+            margin: 0;
+        }
+
+
+        @media screen and (max-width: 768px) {
+            .quiz-card, .chapter {
+                width: 45%;
+            }
+        }
+
+        @media screen and (max-width: 480px) {
+            .quiz-card, .chapter {
+                width: 100%;
+            }
+
+            header nav ul {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            header nav ul li {
+                margin: 5px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="login.html">Login</a></li>
+                <li><a href="register.html">Register</a></li>
+                <li><a href="dashboard.html">Dashboard</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <div class="container">
+            <div class="content">
+                <h1>Available Quizzes</h1>
+                <p>Explore a variety of quizzes to enhance your knowledge.</p>
+
+                <div class="quote">
+                    "The only LIMITS we have are the limits we place upon ourselves."
+                </div>
+
+                <div class="quiz-list">
+                    <div class="quiz-card">
+                        <i class="fas fa-laptop-code"></i>
+                        <h3>Programming Fundamentals</h3>
+                        <p>A quiz to test your understanding of basic programming concepts.</p>
+                        <a href="/quiz/1" class="btn">Start Quiz</a>
+                    </div>
+                    <div class="quiz-card">
+                        <i class="fas fa-flask"></i>
+                        <h3>Basic Science</h3>
+                        <p>Test your knowledge of scientific principles and theories.</p>
+                        <a href="/quiz/2" class="btn">Start Quiz</a>
+                    </div>
+                    <div class="quiz-card">
+                        <i class="fas fa-book"></i>
+                        <h3>History Quiz</h3>
+                        <p>Challenge yourself with a history-based quiz.</p>
+                        <a href="/quiz/3" class="btn">Start Quiz</a>
+                    </div>
+                </div>
+
+                <h2>Available Chapters</h2>
+                <div class="chapter-list">
+                    <div class="chapter">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                        <p>Introduction to Programming</p>
+                    </div>
+                    <div class="chapter">
+                        <i class="fas fa-flask"></i>
+                        <p>Basics of Chemistry</p>
+                    </div>
+                    <div class="chapter">
+                        <i class="fas fa-atom"></i>
+                        <p>Physics Fundamentals</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Quiz Master | All Rights Reserved</p>
+    </footer>
+
+    <script>
+        // Simple script to alert when a quiz card is clicked
+        document.querySelectorAll('.quiz-card').forEach(card => {
+            card.addEventListener('click', function() {
+                alert('You clicked on ' + this.querySelector('h3').textContent);
+            });
+        });
+    </script>
+</body>
+</html>

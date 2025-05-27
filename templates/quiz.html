@@ -1,0 +1,47 @@
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/quiz.css') }}">
+<div class="quiz-container">
+    <h2>{{ quiz.title }}</h2>
+    <p>{{ quiz.description }}</p>
+    <form id="quiz-form" action="/submit_quiz" method="POST">
+        <div id="questions-container"></div>
+        <button type="submit">Submit Quiz</button>
+    </form>
+</div>
+
+<script>
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const subject = 'Mathematics';  
+        const chapter = 'Algebra';  
+
+        // Fetch questions from the backend
+        fetch(`/generate_quiz?subject=${subject}&chapter=${chapter}`)
+            .then(response => response.json())
+            .then(data => {
+                const questionsContainer = document.getElementById("questions-container");
+
+                data.forEach((q, index) => {
+
+                    const questionDiv = document.createElement('div');
+                    questionDiv.classList.add('question');
+                    questionDiv.innerHTML = `<p>${index + 1}. ${q.question}</p>`;
+                    
+  
+                    q.options.forEach((option, i) => {
+                        questionDiv.innerHTML += `
+                            <label>
+                                <input type="radio" name="question_${index}" value="${option.trim()}"> ${option.trim()}
+                            </label><br>
+                        `;
+                    });
+
+                    questionsContainer.appendChild(questionDiv);
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching quiz questions:', error);
+            });
+    });
+</script>
+{% endblock %}

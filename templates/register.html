@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="register.css">
+    <title>Register</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f4f8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        
+        .container {
+            text-align: center; /* Center the text inside the container */
+        }
+        
+        h2 {
+            margin-bottom: 20px; /* Space between the heading and the form */
+            font-size: 2.5em;
+            color: #ff6347; /* Tomato color */
+            animation: fadeIn 1s ease-in;
+        }
+        
+        #register-form {
+            background: linear-gradient(135deg, #ffffff, #f7f7f7);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 400px;
+            transition: transform 0.2s;
+            animation: slideIn 0.5s ease-out;
+        }
+        
+        #register-form:hover {
+            transform: scale(1.02);
+        }
+        
+        #register-form input,
+        #register-form button {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            transition: border-color 0.3s;
+        }
+        
+        #register-form input:focus {
+            border-color: #ff6347; /* Tomato color */
+            outline: none;
+        }
+        
+        #register-form button {
+            background-color: #ff6347; /* Tomato color */
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+        
+        #register-form button:hover {
+            background-color: #ff4500; /* Orange Red color */
+            transform: translateY(-2px);
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Create a new account</h2>
+        <form id="register-form" action="/register" method="POST">
+            <input type="text" id="fullname" name="fullname" placeholder="Full Name" required>
+            <input type="email" id="email" name="email" placeholder="Email" required>
+            <input type="password" id="password" name="password" placeholder="Password" required>
+            <input type="date" id="dob" name="dob" required>
+            <input type="text" id="qualification" name="qualification" placeholder="Qualification" required>
+            <button type="submit">Register</button>
+        </form>
+    </div>
+</body>
+</html>

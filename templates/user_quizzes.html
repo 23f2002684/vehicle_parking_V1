@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Quizzes</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            background: linear-gradient(135deg, #e0f7fa, #80deea);
+            height: 100vh;
+        }
+
+        /* Sidebar styles */
+        .sidebar {
+            width: 250px;
+            background-color: #00796b; /* Teal color */
+            color: white;
+            padding: 20px;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar h2 {
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            text-align: center;
+        }
+
+        .sidebar a {
+            display: block;
+            color: white;
+            text-decoration: none;
+            padding: 10px;
+            margin-bottom: 10px;
+            transition: background-color 0.3s;
+        }
+
+        .sidebar a:hover {
+            background-color: #004d40; /* Darker teal */
+        }
+
+        /* Main content styles */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+        }
+
+        .main-content h1 {
+            color: #00796b;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .quiz-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .quiz-card {
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+        }
+
+        .quiz-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .quiz-card h4 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .quiz-card p {
+            color: #555;
+            margin-bottom: 15px;
+        }
+
+        .quiz-card button {
+            background-color: #00796b;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .quiz-card button:hover {
+            background-color: #004d40; /* Darker teal */
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <h2>User Dashboard</h2>
+        <a href="user_dashboard.html">Dashboard</a>
+        <a href="user_quizzes.html">Quizzes</a>
+        <a href="user_profile.html">Profile</a>
+        <a href="user_results.html">Results</a>
+        <a href="settings.html">Settings</a>
+    </div>
+
+    <div class="main-content">
+        <h1>Your Quizzes</h1>
+        <div class="quiz-list">
+            <div class="quiz-card">
+                <h4>Mathematics Quiz</h4>
+                <p>Test your mathematical skills with this timed quiz.</p>
+                <button onclick="startQuiz('Mathematics')">Start Quiz</button>
+            </div>
+            <div class="quiz-card">
+                <h4>Science Quiz</h4>
+                <p>Challenge your knowledge in Science with this quiz.</p>
+                <button onclick="startQuiz('Science')">Start Quiz</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function startQuiz(subject) {
+            alert('Starting ' + subject + ' Quiz!');
+        }
+    </script>
+</body>
+</html>
