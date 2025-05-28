@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quiz Master</title>
+    <title>Parker Avenue</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <script src="https://kit.fontawesome.com/a076d05399.js"></script> 
     <style>
 
@@ -173,9 +174,9 @@
         <nav>
             <ul>
                 <li><a href="/">Home</a></li>
-                <li><a href="login.html">Login</a></li>
-                <li><a href="register.html">Register</a></li>
-                <li><a href="dashboard.html">Dashboard</a></li>
+                <li><a href="user.html">User Login</a></li>
+                <li><a href="register.html">New User Registration</a></li>
+                <li><a href="admin.html">Admin Login</a></li>
             </ul>
         </nav>
     </header>
@@ -183,64 +184,20 @@
     <main>
         <div class="container">
             <div class="content">
-                <h1>Available Quizzes</h1>
-                <p>Explore a variety of quizzes to enhance your knowledge.</p>
+                <h1>Welcome to Parker Avenue!!</h1>
 
                 <div class="quote">
-                    "The only LIMITS we have are the limits we place upon ourselves."
+                    "Looking for Parking Spots? Look no further! Parker Avenue is here to help you find the perfect parking spot in your area. Whether you're at home, work, or on the go, our platform connects you with available parking spaces nearby. Say goodbye to parking hassles and hello to convenience!"
                 </div>
-
-                <div class="quiz-list">
-                    <div class="quiz-card">
-                        <i class="fas fa-laptop-code"></i>
-                        <h3>Programming Fundamentals</h3>
-                        <p>A quiz to test your understanding of basic programming concepts.</p>
-                        <a href="/quiz/1" class="btn">Start Quiz</a>
-                    </div>
-                    <div class="quiz-card">
-                        <i class="fas fa-flask"></i>
-                        <h3>Basic Science</h3>
-                        <p>Test your knowledge of scientific principles and theories.</p>
-                        <a href="/quiz/2" class="btn">Start Quiz</a>
-                    </div>
-                    <div class="quiz-card">
-                        <i class="fas fa-book"></i>
-                        <h3>History Quiz</h3>
-                        <p>Challenge yourself with a history-based quiz.</p>
-                        <a href="/quiz/3" class="btn">Start Quiz</a>
-                    </div>
-                </div>
-
-                <h2>Available Chapters</h2>
-                <div class="chapter-list">
-                    <div class="chapter">
-                        <i class="fas fa-chalkboard-teacher"></i>
-                        <p>Introduction to Programming</p>
-                    </div>
-                    <div class="chapter">
-                        <i class="fas fa-flask"></i>
-                        <p>Basics of Chemistry</p>
-                    </div>
-                    <div class="chapter">
-                        <i class="fas fa-atom"></i>
-                        <p>Physics Fundamentals</p>
-                    </div>
+                <div class="image-container">
+                    <img src="{{url_for('static', filename='images/parking_lot.jpg')}}"alt="">
                 </div>
             </div>
         </div>
     </main>
 
     <footer>
-        <p>&copy; 2025 Quiz Master | All Rights Reserved</p>
+        <p>&copy; 2025 Parker Avenue | All Rights Reserved</p>
     </footer>
-
-    <script>
-        // Simple script to alert when a quiz card is clicked
-        document.querySelectorAll('.quiz-card').forEach(card => {
-            card.addEventListener('click', function() {
-                alert('You clicked on ' + this.querySelector('h3').textContent);
-            });
-        });
-    </script>
 </body>
 </html>

@@ -24,7 +24,7 @@ with app.app_context():
 
 @app.route('/')
 def index():
-    return jsonify({'message': 'Welcome to the Parking Reservation API.'})
+    return jsonify({'message': 'Welcome to the Parking Reservation Interface!!'})
 
 #users route
 
