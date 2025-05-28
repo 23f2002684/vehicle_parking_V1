@@ -1,262 +1,156 @@
-#Main app
-from flask import Flask, render_template, redirect, url_for
+import os
+from flask import Flask, request, jsonify
+from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime
+from models import db, User, ParkingLot, ParkingSpot, Reservation
 
-#Figuring out the post and get methods
-from flask import request
+app = Flask(__name__, instance_relative_config=True)#relative config allows Flask to find the instance folder
 
-#Locally importing model
-from model import db, User, Admin, Category, Product
-app = Flask(__name__, instance_relative_config=True)
+# Loading environment variables
+from dotenv import load_dotenv
+load_dotenv()
 
-#Path to my database
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///project.db"
-
+# App configuration
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', '1234567890')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI', 'sqlite:///parking_management.db')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 
-#This creates the tables in the db
+# Creating the database tables
 with app.app_context():
     db.create_all()
 
-#First is the index route which gives a brief intro to website
-#Along with the sign in option
-@app.route('/', methods = ['POST', 'GET'])
+#home route
+
+@app.route('/')
 def index():
-    if request.method == "POST":
-        
-        #Bad Authentication
-        users = User.query.all()    
-        for user in users:
-            if request.form["username"] == user.username and request.form["password"] == user.password:
-                return render_template("login.html", products = Product.query.all(), product_count_negative=False)
+    return jsonify({'message': 'Welcome to the Parking Reservation API.'})
 
-        return render_template("index.html", again = True)        
+#users route
 
-    return render_template("index.html", again = False)
+@app.route('/users', methods=['POST'])
+def register_user():
+    payload = request.get_json()
+    new_user = User(
+        username=payload['username'],
+        password=payload['password'],
+        is_admin=payload.get('is_admin', False)
+    )
+    db.session.add(new_user)
+    db.session.commit()
+    return jsonify({'message': 'User account created', 'user_id': new_user.id}), 201
 
-#Register the user first
-#Registration page has to be same for all?
-@app.route('/register', methods = ['GET', 'POST'])
-def register():
-    if request.method == "POST":
-        users = User.query.all()
+@app.route('/users', methods=['GET'])
+def fetch_all_users():
+    user_list = User.query.all()
+    results = [{
+        'id': u.id,
+        'username': u.username,
+        'is_admin': u.is_admin
+    } for u in user_list]
+    return jsonify(results)
 
-        for user in users:
-            if user.username == request.form["username"]:
-                return render_template("register.html", again = True)
-        
-        db.session.add(User(username = request.form["username"], password = request.form["password"], fname = request.form["fname"].lower(), lname = request.form["lname"].lower()))
-        db.session.commit()
+@app.route('/users/<int:user_id>', methods=['GET'])
+def fetch_user_by_id(user_id):
+    user = User.query.get_or_404(user_id)
+    return jsonify({
+        'id': user.id,
+        'username': user.username,
+        'is_admin': user.is_admin
+    })
 
-        return render_template("login.html", products = Product.query.all(), product_count_negative=False)
-    
-    return render_template("register.html", again = False)
+@app.route('/users/<int:user_id>', methods=['DELETE'])
+def remove_user(user_id):
+    target = User.query.get_or_404(user_id)
+    db.session.delete(target)
+    db.session.commit()
+    return jsonify({'message': f'User {user_id} has been deleted.'})
 
-@app.route('/login', methods=["POST"])
-def login():
-    if request.method == "POST":
-        products = Product.query.all()
-        
-        (total, cart) = (0, {})
+#parking lot route
 
-        #Product count cannot become negative
-        for product in products:
-            if product.pcount != 0 and request.form[str(product.pid)] != "" and product.pcount-int(request.form[str(product.pid)])<0:
-                return render_template("login.html", products = Product.query.all(), product_count_negative=True)
-            if product.pcount != 0 and request.form[str(product.pid)] != "":
-                cart[product.pid] = [product.pname, int(request.form[str(product.pid)])*product.pprice]
-                total += cart[product.pid][1]
-        
-        return render_template("cart.html", items_bought = cart, total_cost = total)
+@app.route('/lots', methods=['POST'])
+def add_parking_lot():
+    payload = request.get_json()
+    lot = ParkingLot(
+        prime_location_name=payload['prime_location_name'],
+        price_per_hour=payload['price_per_hour'],
+        address=payload['address'],
+        pin_code=payload['pin_code'],
+        max_spots=payload['max_spots']
+    )
+    db.session.add(lot)
+    db.session.commit()
+    return jsonify({'message': 'Congratulations!!! Parking lot added successfully', 'lot_id': lot.id}), 201
 
-@app.route('/admin', methods = ['GET', 'POST'])
-def admin():
-    if request.method == "POST":
-        
-        #Bad authentication
-        admins = Admin.query.all()
-        
-        for admin in admins:
-            if request.form["username"] == admin.username and request.form["password"] == admin.password:
-                return render_template("adminlogin.html", products = Product.query.all(), categories = Category.query.all())
+@app.route('/lots', methods=['GET'])
+def list_all_lots():
+    lots = ParkingLot.query.all()
+    return jsonify([
+        {
+            'id': l.id,
+            'location_name': l.prime_location_name,
+            'rate': l.price_per_hour,
+            'address': l.address,
+            'pincode': l.pin_code,
+            'total_spots': l.max_spots
+        } for l in lots
+    ])
 
-        return render_template("admin.html", again=True)
+#reservation route
+@app.route('/reservations', methods=['POST'])
+def book_spot():
+    data = request.get_json()
+    selected_spot = ParkingSpot.query.get_or_404(data['spot_id'])
 
-    return render_template("admin.html", again=False)
+    if selected_spot.status == 'O':
+        return jsonify({'error': 'Sorry, this spot is currently occupied. Please select another spot or come back later.'}), 409
 
-@app.route("/search", methods = ['GET', 'POST'])
-def search():
-    if request.method == "POST":
-        if request.form["item"]=="product":
-            products = Product.query.all()
+    reservation = Reservation(
+        spot_id=selected_spot.id,
+        user_id=data['user_id'],
+        cost_per_hour=data['cost_per_hour']
+    )
 
-            for product in products:
-                if product.pname.lower() == request.form["itemname"].lower():
-                    return render_template("found.html", is_product = True, product=True)
-
-            return render_template("found.html", is_product = True, product=False)
-        
-        if request.form["item"]=="category":
-            categories = Category.query.all()
-
-            for category in categories:
-                if category.cname.lower() == request.form["itemname"].lower():
-                    return render_template("found.html", is_product = False, category=True)
-
-            return render_template("found.html", is_product=False, category=False)
-    
-    return render_template("search.html")
-
-@app.route("/category", methods = ['GET', 'POST'])
-def category():
-    if request.method == "POST":
-        db.session.add(Category(cname = request.form["cname"]))
-        db.session.commit()
-    
-    return render_template("category.html", categories = Category.query.all())
-
-@app.route("/category/update/<int:category_id>", methods = ['GET', 'POST'])
-def category_update(category_id):
-    if request.method == "POST":
-
-        #Create a new category
-        new_cat = Category(cname = request.form["cname"])
-        
-        #Add the new category name
-        db.session.add(new_cat)
-
-        #Update products with the old category
-        products = Product.query.all()
-
-        for product in products:
-            if product.pcid == category_id:
-                db.session.add(Product(pname=product.pname, pcid=new_cat.cid, pcount=product.pcount))
-                db.session.delete(product)
-
-        #Delete the old category name
-        db.session.delete(Category.query.filter_by(cid = category_id).first())
-
-        #Do all the changes
-        db.session.commit()
-
-        return redirect(url_for("category"))
-
-    return render_template("category_update.html", category = Category.query.filter_by(cid = category_id).first())
-
-@app.route("/category/delete/<int:category_id>")
-def category_delete(category_id):
-    
-    #Update products with the old category
-    products = Product.query.all()
-
-    for product in products:
-        if product.pcid == category_id:
-            db.session.add(Product(pname=product.pname, pcid=1, pcount=product.pcount, pprice=product.pprice))
-            db.session.delete(product)
-
-    db.session.delete(Category.query.filter_by(cid = category_id).first())
+    selected_spot.status = 'O'
+    db.session.add(reservation)
     db.session.commit()
 
-    return redirect(url_for("category"))
+    return jsonify({
+        'message': 'Thank You! Your reservation has been created successfully.',
+        'reservation_id': reservation.id
+    }), 201
 
-@app.route("/product", methods = ["GET", "POST"])
-def product():
-    categories = Category.query.all()
-    catd = {}
-    for category in categories:
-        catd[category.cid] = category.cname
-    
-    if request.method == "POST":
-        #No negative product count and price
-        product_count = int(request.form["pcount"])
-        product_price = int(request.form["pprice"])
+@app.route('/reservations/<int:res_id>/leave', methods=['POST'])
+def finish_parking(res_id):
+    reservation = Reservation.query.get_or_404(res_id)
 
-        if product_count<0 and product_price<0:
-            return render_template("product.html", products = Product.query.all(), categorydict = catd, categories=Category.query.all(), was_price_negative=True, was_count_negative=True)
+    if reservation.leaving_timestamp is not None:
+        return jsonify({'error': 'Oops! This reservation has already ended.'}), 400
 
-        if product_count < 0:
-            return render_template("product.html", products = Product.query.all(), categorydict = catd, categories=Category.query.all(), was_price_negative=False, was_count_negative=True)
+    reservation.leaving_timestamp = datetime.utcnow()
+    reservation.calculate_total_cost()
+    reservation.spot.status = 'A'
 
-        if product_price < 0:
-            return render_template("product.html", products = Product.query.all(), categorydict = catd, categories=Category.query.all(), was_price_negative=True, was_count_negative=False)
-
-        db.session.add(Product(pname = request.form["pname"], pcid = request.form["pcid"], pcount = product_count, pprice = product_price))
-        db.session.commit()
-
-        return redirect(url_for("product"))
-    
-    return render_template("product.html", products = Product.query.all(), categorydict = catd, categories=Category.query.all(), was_price_negative=False, was_count_negative=False)
-
-@app.route("/product/update/<int:product_id>", methods = ['GET', 'POST'])
-def product_update(product_id):
-    categories = Category.query.all()
-    catd = {}
-    for category in categories:
-        catd[category.cid] = category.cname
-    
-    if request.method == "POST":
-
-        update_product = Product.query.filter_by(pid = product_id).first()
-        
-        #ONLY UPDATE THE FIELDS THAT HAVE CHANGED
-        if request.form["pname"] != "":
-            update_product.pname = request.form["pname"]
-        
-        #Product price and count both are negative
-        if request.form["pcount"] !="" and request.form["pprice"] != "" and int(request.form["pcount"]) < 0 and int(request.form["pprice"]) < 0:
-            return render_template("product_update.html", product = Product.query.filter_by(pid=product_id).first(), categorydict = catd, categories=Category.query.all(), was_count_negative = True, was_price_negative = True, is_count_becoming_negative=False)
-
-        #Also check if the count is positive
-        if request.form["pcount"] !="":
-            if int(request.form["pcount"]) > 0:
-                if request.form["change_count"] == "add":
-                    update_product.pcount += int(request.form["pcount"])
-                elif (update_product.pcount-int(request.form["pcount"])) >= 0:
-                    update_product.pcount -= int(request.form["pcount"])
-                elif (update_product.pcount-int(request.form["pcount"])) < 0:
-                    return render_template("product_update.html", product = Product.query.filter_by(pid=product_id).first(), categorydict = catd, categories=Category.query.all(), was_count_negative = False, was_price_negative = False, is_count_becoming_negative=True)
-            else:
-                return render_template("product_update.html", product = Product.query.filter_by(pid=product_id).first(), categorydict = catd, categories=Category.query.all(), was_count_negative = True, was_price_negative = False, is_count_becoming_negative=False)
-
-        #Select option should be not "none"
-        if update_product.pcid != request.form["change_category"] and request.form["change_category"] != "none":
-            update_product.pcid = request.form["change_category"]
-
-        #Also check if price is positive
-        if request.form["pprice"] != "":
-            if int(request.form["pprice"]) > 0:
-                update_product.pprice = int(request.form["pprice"])
-            else:            
-                return render_template("product_update.html", product = Product.query.filter_by(pid=product_id).first(), categorydict = catd, categories=Category.query.all(), was_count_negative=False, was_price_negative=True, is_count_becoming_negative=False)
-
-        db.session.commit()
-
-        return redirect(url_for("product"))
-    
-
-    return render_template("product_update.html", product = Product.query.filter_by(pid=product_id).first(), categorydict = catd, categories=Category.query.all(), was_count_negative=False, was_price_negative=False, is_count_becoming_negative=False)
-
-@app.route("/product/delete/<int:product_id>", methods = ["GET", "POST"])
-def product_delete(product_id):
-    db.session.delete(Product.query.filter_by(pid = product_id).first())
-    db.session.commit()
-    return redirect(url_for("product"))
-
-@app.route("/sample")
-def sample():
-    #Categories
-    sample = [Category(cname='Miscellaneous'), Category(cname='Dairy'), Category(cname='Stationary'), 
-              Product(pname='Paneer', pcid=2, pcount=5, pprice= 60), Product(pname='Milk', pcid=2, pcount=2, pprice= 30), 
-              Product(pname='Pen', pcid=3, pcount=6, pprice= 10), Product(pname='Notebook', pcid=3, pcount=5, pprice= 40),
-              Product(pname='Eraser', pcid=3, pcount=0, pprice= 5),
-              Admin(username='admin', password='1234'), 
-              User(username='nomit', password='1234', fname = 'nomit')]
-
-    for item in sample:
-        db.session.add(item)
-    
     db.session.commit()
 
-    return redirect("/")
+    return jsonify({
+        'message': 'Checkout complete.',
+        'final_cost': reservation.total_cost
+    })
+
+@app.route('/reservations', methods=['GET'])
+def show_reservations():
+    all_reservations = Reservation.query.all()
+    return jsonify([
+        {
+            'id': r.id,
+            'user': r.user.username,
+            'spot_number': r.spot.spot_number,
+            'start_time': r.parking_timestamp.isoformat(),
+            'end_time': r.leaving_timestamp.isoformat() if r.leaving_timestamp else None,
+            'total_cost': r.total_cost
+        } for r in all_reservations
+    ])
 
 if __name__ == '__main__':
-    app.run(debug = True)
+    app.run(debug=True)
