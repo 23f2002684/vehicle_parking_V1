@@ -148,16 +148,6 @@
 
 
         @media screen and (max-width: 768px) {
-            .quiz-card, .chapter {
-                width: 45%;
-            }
-        }
-
-        @media screen and (max-width: 480px) {
-            .quiz-card, .chapter {
-                width: 100%;
-            }
-
             header nav ul {
                 flex-direction: column;
                 align-items: center;
@@ -173,10 +163,10 @@
     <header>
         <nav>
             <ul>
-                <li><a href="/">Home</a></li>
-                <li><a href="user.html">User Login</a></li>
-                <li><a href="register.html">New User Registration</a></li>
-                <li><a href="admin.html">Admin Login</a></li>
+                <li><a href="{{ url_for('home') }}">Home</a></li>
+                <li><a href="{{ url_for('user_login') }}">User Login</a></li>
+                <li><a href="{{ url_for('register_user') }}">New User Registration</a></li>
+                <li><a href="{{ url_for('admin_login') }}">Admin Login</a></li>
             </ul>
         </nav>
     </header>
@@ -190,7 +180,7 @@
                     "Looking for Parking Spots? Look no further! Parker Avenue is here to help you find the perfect parking spot in your area. Whether you're at home, work, or on the go, our platform connects you with available parking spaces nearby. Say goodbye to parking hassles and hello to convenience!"
                 </div>
                 <div class="image-container">
-                    <img src="{{url_for('static', filename='images/parking_lot.jpg')}}"alt="">
+                    <img src="{{url_for('static', filename='images/parking_lot.jpg')}}"alt=" " style="max-width: 100%; height: auto; margin-top: 20px;">
                 </div>
             </div>
         </div>

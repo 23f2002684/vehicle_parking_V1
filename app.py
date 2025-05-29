@@ -1,5 +1,5 @@
 import os
-from flask import Flask, request, jsonify
+from flask import Flask, render_template, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from models import db, User, ParkingLot, ParkingSpot, Reservation
@@ -23,12 +23,13 @@ with app.app_context():
 #home route
 
 @app.route('/')
-def index():
-    return jsonify({'message': 'Welcome to the Parking Reservation Interface!!'})
+def home():
+    return render_template('index.html')
 
 #users route
 
-@app.route('/users', methods=['POST'])
+
+@app.route('/register_user', methods=['POST'])
 def register_user():
     payload = request.get_json()
     new_user = User(
@@ -115,10 +116,7 @@ def book_spot():
     db.session.add(reservation)
     db.session.commit()
 
-    return jsonify({
-        'message': 'Thank You! Your reservation has been created successfully.',
-        'reservation_id': reservation.id
-    }), 201
+    return jsonify({ 'message': 'Thank You! Your reservation has been created successfully.','reservation_id': reservation.id }), 201
 
 @app.route('/reservations/<int:res_id>/leave', methods=['POST'])
 def finish_parking(res_id):
