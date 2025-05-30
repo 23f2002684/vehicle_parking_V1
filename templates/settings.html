@@ -40,7 +40,102 @@
         .main-content h1 {
             font-size: 24px;
             color: #333;
+            margin-bottom: 20px
         }
+        .setting-section {
+            background: #f4f4f4;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .dark-mode {
+            background-color: #121212;
+            color: #e0e0e0;
+        }
+        .dark-mode .setting-section {
+            background-color: #1e1e1e;
+        }
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0;
+            right: 0; bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #4CAF50;
+        }
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        .button {
+            background-color: #007BFF;
+            color: white;
+            padding: 10px 18px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 999;
+            left: 0; top: 0;
+            width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.6);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            width: 400px;
+        }
+        .modal-content input {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+        }
+        .close {
+            float: right;
+            font-size: 20px;
+            cursor: pointer;
+        .help-form textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            resize: vertical;
+            height: 100px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
         @media screen and (max-width: 768px) {
             .sidebar {
                 width: 200px;
@@ -60,14 +155,75 @@
         <a href="reports.html">Reports</a>
         <a href="settings.html">Settings</a>
     </div>
-
     <div class="main-content">
         <h1>Settings</h1>
         <p>Change the system settings here.</p>
     </div>
+    <div class="setting-section">
+            <h3>Appearance</h3>
+            <label>Dark Mode:
+                <label class="switch">
+                    <input type="checkbox" id="darkToggle">
+                    <span class="slider"></span>
+                </label>
+            </label>
+        </div>
+        <div class="setting-section">
+            <h3>Notifications</h3>
+            <label>Enable Email Alerts:
+                <label class="switch">
+                    <input type="checkbox" checked>
+                    <span class="slider"></span>
+                </label>
+            </label>
+        </div>
+        <div class="setting-section">
+            <h3>Security</h3>
+            <button class="button" onclick="openModal()">Change Password</button>
+        </div>
+        <div class="setting-section">
+            <h3>Ask for Help</h3>
+            <form class="help-form" onsubmit="handleHelp(event)">
+                <textarea placeholder="Describe your issue or question..."></textarea>
+                <button class="button" type="submit">Submit</button>
+            </form>
+            <p id="help-response" style="color: green;"></p>
+        </div>
+    </div>
+    <div id="passwordModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h3>Change Password</h3>
+            <input type="password" placeholder="Current Password">
+            <input type="password" placeholder="New Password">
+            <input type="password" placeholder="Confirm New Password">
+            <button class="button">Update Password</button>
+        </div>
+    </div>
 
     <script>
+        const darkToggle = document.getElementById('darkToggle');
+        darkToggle.addEventListener('change', () => {
+            document.body.classList.toggle('dark-mode');
+        });
 
+        function openModal() {
+            document.getElementById('passwordModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('passwordModal').style.display = 'none';
+        }
+        window.onclick = function(event) {
+            const modal = document.getElementById('passwordModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        };
+        function handleHelp(event) {
+            event.preventDefault();
+            document.getElementById('help-response').textContent = "Thank you! We'll get back to you shortly.";
+        }
     </script>
 </body>
 </html>
