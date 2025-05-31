@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Quiz</title>
+    <title>Create Lot</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -31,14 +31,14 @@
             display: block;
             margin-bottom: 5px;
         }
-        select, input[type="text"], input[type="datetime-local"] {
+        input[type="text"] {
             width: 100%;
             padding: 10px;
             border: 1px solid #ddd;
             border-radius: 4px;
         }
         button {
-            background-color: #007bff;
+            background-color: #28a745;
             color: white;
             padding: 10px 20px;
             border: none;
@@ -47,46 +47,43 @@
             width: 100%;
         }
         button:hover {
-            background-color: #0056b3;
+            background-color: #218838;
         }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h2>Create a New Quiz</h2>
-        <form action="#" method="POST" id="quizForm">
+        <h2>Create a New Parking Lot</h2>
+        <form action="#" method="POST" id="lotForm">
             <div class="form-group">
-                <label for="subject">Select Subject</label>
-                <select id="subject" name="subject">
-                    <option value="math">Math</option>
-                    <option value="science">Science</option>
-                    <option value="history">History</option>
-                </select>
+                <label for="prime_location_name">Prime Location Name</label>
+                <input type="text" id="prime_location_name" name="prime_location_name" required>
             </div>
             <div class="form-group">
-                <label for="chapter">Select Chapter</label>
-                <select id="chapter" name="chapter">
-                    <option value="chapter1">Chapter 1</option>
-                    <option value="chapter2">Chapter 2</option>
-                </select>
+                <label for="price_per_hour">Price per Hour</label>
+                <input type="text" id="price_per_hour" name="price_per_hour" required>
             </div>
             <div class="form-group">
-                <label for="quiz_date">Quiz Date and Time</label>
-                <input type="datetime-local" id="quiz_date" name="quiz_date">
+                <label for="address">Adress</label>
+                <input type="text" id="address" name="address" required>
             </div>
             <div class="form-group">
-                <label for="duration">Quiz Duration (in minutes)</label>
-                <input type="text" id="duration" name="duration">
+                <label for="pin_code">Pincode</label>
+                <input type="text" id="pin_code" name="pin_code" required>
             </div>
-            <button type="submit">Create Quiz</button>
+            <div class="form-group">
+                <label for="max_spots">Max Spots</label>
+                <input type="text" id="max_spots" name="max_spots" required>
+            </div>
+            <button type="submit">Create Lot</button>
         </form>
     </div>
 
     <script>
-        document.getElementById('quizForm').addEventListener('submit', function(event) {
+        document.getElementById('lotForm').addEventListener('submit', function(event) {
             event.preventDefault();
-            alert('Quiz Created!');
+            alert('Lot Created!');
         });
     </script>
 
