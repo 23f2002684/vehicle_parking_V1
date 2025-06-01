@@ -60,12 +60,17 @@ def fetch_user_by_id(user_id):
         'is_admin': user.is_admin
     })
 
-@app.route('/users/<int:user_id>', methods=['DELETE'])
-def remove_user(user_id):
-    target = User.query.get_or_404(user_id)
-    db.session.delete(target)
-    db.session.commit()
-    return jsonify({'message': f'User {user_id} has been deleted.'})
+@app.route('/delete_account', methods=['POST'])
+@login_required
+def delete_account():
+    user = User.query.get(current_user.id)
+    if user:
+        db.session.delete(user)
+        db.session.commit()
+        flash("Account deleted successfully.", "info")
+        return redirect(url_for('home'))  # Or login page
+    flash("Something went wrong.", "danger")
+    return redirect(url_for('settings'))
 
 #parking lot route
 
@@ -82,6 +87,26 @@ def add_parking_lot():
     db.session.add(lot)
     db.session.commit()
     return jsonify({'message': 'Congratulations!!! Parking lot added successfully', 'lot_id': lot.id}), 201
+
+@app.route('/edit_lot/<int:lot_id>', methods=['GET', 'POST'])
+def edit_lot(lot_id):
+    lot = get_lot_by_id(lot_id)
+    occupied_spots = count_occupied_spots(lot_id)
+    if request.method == 'POST':
+        # Handle update logic
+        pass
+    return render_template('edit_lot.html', lot=lot, occupied_spots=occupied_spots)
+
+@app.route('/delete_lot/<int:lot_id>', methods=['GET', 'POST'])
+def delete_lot(lot_id):
+    lot = get_lot_by_id(lot_id)
+    occupied_spots = count_occupied_spots(lot_id)
+    if request.method == 'POST':
+        if occupied_spots == 0:
+            delete_lot_from_db(lot_id)
+            return redirect(url_for('dashboard'))
+    return render_template('delete_lot.html', lot=lot, occupied_spots=occupied_spots)
+
 
 @app.route('/lots', methods=['GET'])
 def list_all_lots():

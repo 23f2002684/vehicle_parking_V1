@@ -79,10 +79,10 @@
   <script>
     document.getElementById("editLotForm").addEventListener("submit", function(event) {
       const maxSpots = parseInt(document.getElementById("max_spots").value);
-      const occupiedSpots = 5; 
+      const occupiedSpots = {{ occupied_spots}};
 
       if (maxSpots < occupiedSpots) {
-        alert(`Cannot reduce max spots below currently occupied (${occupiedSpots})`);
+        alert(`Cannot reduce max spots below currently occupied ({{ occupied_spots }})`);
         event.preventDefault();
       } else {
         alert("Lot Updated Successfully!");

@@ -189,8 +189,13 @@
             </form>
             <p id="help-response" style="color: green;"></p>
         </div>
+        <div class="setting-section">
+            <h3>Delete Account</h3>
+            <p>This action is irreversible. All your data will be permanently deleted.</p>
+            <button class="delete-button" onclick="openDeleteModal()">Delete My Account</button>
+        </div>
     </div>
-    <div id="passwordModal" class="modal">
+    <div id="passwordmodal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeModal()">&times;</span>
             <h3>Change Password</h3>
@@ -198,6 +203,20 @@
             <input type="password" placeholder="New Password">
             <input type="password" placeholder="Confirm New Password">
             <button class="button">Update Password</button>
+        </div>
+    </div>
+    </div>
+
+    <!-- New Delete Modal -->
+    <div id="deletemodal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeDeleteModal()">&times;</span>
+            <h3>Confirm Account Deletion</h3>
+            <p>Are you sure you want to delete your account? This cannot be undone.</p>
+            <form method="POST" action="{{ url_for('delete_account') }}">
+                <button class="delete-button" type="submit">Yes, Delete My Account</button>
+                <button class="button" type="button" onclick="closeDeleteModal()">Cancel</button>
+            </form>
         </div>
     </div>
 
@@ -208,16 +227,27 @@
         });
 
         function openModal() {
-            document.getElementById('passwordModal').style.display = 'flex';
+            document.getElementById('passwordmodal').style.display = 'flex';
         }
 
         function closeModal() {
-            document.getElementById('passwordModal').style.display = 'none';
+            document.getElementById('passwordmodal').style.display = 'none';
+        }
+        function openDeleteModal() {
+            document.getElementById('deletemodal').style.display = 'flex';
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deletemodal').style.display = 'none';
         }
         window.onclick = function(event) {
-            const modal = document.getElementById('passwordModal');
+            const passwordmodal = document.getElementById('passwordmodal');
+            const deletemodal = document.getElementById('deletemodal');
             if (event.target === modal) {
                 closeModal();
+            }
+            else if (event.target === deletemodal) {
+                closeDeleteModal();
             }
         };
         function handleHelp(event) {

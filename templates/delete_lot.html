@@ -49,25 +49,22 @@
 
   <div class="container">
     <h2>Confirm Deletion</h2>
-    <p>Are you sure you want to delete this parking lot?</p>
-    <p><strong>Note:</strong> You can only delete the lot if all parking spots are empty.</p>
-    <form id="deleteForm" action="/delete_lot" method="POST">
-      <input type="hidden" name="lot_id" value="123"> 
+    <p>Are you sure you want to delete the lot: <strong>{{ lot.prime_location_name }}</strong>?</p>
+    <p><strong>Note:</strong> You can only delete this lot if all parking spots are empty.</p>
+    <form method="POST" action="{{ url_for('delete_lot', lot_id=lot.id) }}" id="deleteForm">
       <button type="submit" class="confirm-btn">Yes, Delete</button>
-      <button type="button" onclick="window.location.href='admin_dashboard.html'" class="cancel-btn">Cancel</button>
+      <button type="button" class="cancel-btn" onclick="window.location.href='{{ url_for('dashboard') }}'">Cancel</button>
     </form>
   </div>
 
   <script>
     document.getElementById("deleteForm").addEventListener("submit", function(event) {
-      const occupiedSpots = 3; 
-
+      const occupiedSpots = {{ occupied_spots }};
       if (occupiedSpots > 0) {
-        alert(`Cannot delete lot. ${occupiedSpots} spot(s) are still occupied.`);
+        alert(`Cannot delete. {{ occupied_spots }} spot(s) are still occupied.`);
         event.preventDefault();
       } else {
         alert("Lot deleted successfully!");
-        window.location.href = "admin_dashboard.html";
       }
     });
   </script>
