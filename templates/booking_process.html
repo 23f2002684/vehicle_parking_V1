@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Book a Parking Spot</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #e0f7fa, #80deea);
+      margin: 0;
+      padding: 0;
+    }
+
+    .booking-container {
+      max-width: 700px;
+      margin: 50px auto;
+      background-color: #ffffff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+      text-align: center;
+      color: #00796b;
+      margin-bottom: 10px;
+    }
+
+    p {
+      text-align: center;
+      color: #555;
+      margin-bottom: 20px;
+    }
+
+    form label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: bold;
+      color: #333;
+    }
+
+    form select,
+    form input[type="date"],
+    form input[type="time"] {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 20px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 16px;
+    }
+
+    button {
+      width: 100%;
+      background-color: #00796b;
+      color: white;
+      border: none;
+      padding: 12px;
+      font-size: 16px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #004d40;
+    }
+  </style>
+</head>
+<body>
+
+<div class="booking-container">
+  <h2>Book a Parking Spot</h2>
+  <p>Select your preferred location, date, and time</p>
+
+  <form id="booking-form" action="/submit_booking" method="POST">
+    <label for="location">Select Location</label>
+    <select id="location" name="location" required>
+      <option value="">Loading locations...</option>
+    </select>
+
+    <label for="date">Booking Date</label>
+    <input type="date" id="date" name="date" required />
+
+    <label for="time">Booking Time</label>
+    <input type="time" id="time" name="time" required />
+
+    <button type="submit">Confirm Booking</button>
+  </form>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const locationDropdown = document.getElementById("location");
+
+    // Fetch available parking lot locations
+    fetch("/lots")
+      .then(response => response.json())
+      .then(data => {
+        locationDropdown.innerHTML = ""; // Clear old options
+        data.forEach(loc => {
+          const option = document.createElement("option");
+          option.value = loc.id;
+          option.textContent = loc.name;
+          locationDropdown.appendChild(option);
+        });
+      })
+      .catch(error => {
+        console.error("Failed to fetch locations:", error);
+        locationDropdown.innerHTML = "<option>Error loading locations</option>";
+      });
+
+    // Optionally: handle form submission with confirmation
+    document.getElementById("booking-form").addEventListener("submit", function(e) {
+      const confirmBooking = confirm("Confirm your booking?");
+      if (!confirmBooking) e.preventDefault();
+    });
+  });
+</script>
+
+</body>
+</html>

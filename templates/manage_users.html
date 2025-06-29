@@ -54,20 +54,79 @@
 <body>
     <div class="sidebar">
         <h2>Admin Dashboard</h2>
-        <a href="dashboard.html">Dashboard</a>
+        <a href="admin_dashboard.html">Dashboard</a>
         <a href="manage_users.html">Manage Users</a>
-        <a href="manage_quizzes.html">Manage Quizzes</a>
+        <a href="manage_lots.html">Manage Lots</a>
         <a href="reports.html">Reports</a>
         <a href="settings.html">Settings</a>
     </div>
 
     <div class="main-content">
         <h1>Manage Users</h1>
-        <p>Manage all users and their access to the platform.</p>
+        <p>Manage all users and their access to the platform. Ban users if needed.</p>
     </div>
 
     <script>
-        // Additional JS functionality if needed
+        async function fetchUsers() {
+            const res = await fetch('/users');
+            const users = await res.json();
+            const tbody = document.querySelector('#userTable tbody');
+            tbody.innerHTML = '';
+
+            users.forEach(user => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${user.id}</td>
+                    <td>${user.username}</td>
+                    <td>${user.is_banned ? 'Banned' : 'Active'}</td>
+                    <td>
+                        <button class="delete-btn" onclick="deleteUser(${user.id})">Delete</button>
+                        <button class="ban-btn" onclick="toggleBan(${user.id}, ${user.is_banned})">${user.is_banned ? 'Unban' : 'Ban'}</button>
+                        <button class="assign-btn" onclick="assignSpot(${user.id})">Assign Spot</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        async function deleteUser(id) {
+            if (confirm('Are you sure you want to delete this user?')) {
+                await fetch(`/users/${id}`, { method: 'DELETE' });
+                alert('User deleted.');
+                fetchUsers();
+            }
+        }
+
+        async function toggleBan(id, isBanned) {
+            const payload = { is_banned: !isBanned };
+            await fetch(`/users/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            alert(`User ${!isBanned ? 'banned' : 'unbanned'}.`);
+            fetchUsers();
+        }
+
+        function assignSpot(userId) {
+            const spot = prompt("Enter the new parking spot ID to assign:");
+            if (spot) {
+                fetch('/assign_spot', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: userId, spot_id: spot })
+                }).then(res => {
+                    if (res.ok) {
+                        alert("Spot assigned!");
+                    } else {
+                        alert("Assignment failed.");
+                    }
+                });
+            }
+        }
+
+        // Initial load
+        fetchUsers();
     </script>
 </body>
 </html>

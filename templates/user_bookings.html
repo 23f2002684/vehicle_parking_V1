@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Your Bookings</title>
+  <style>
+    * {
+      margin: 0; padding: 0; box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Arial', sans-serif;
+      display: flex;
+      background: linear-gradient(135deg, #e0f7fa, #80deea);
+      height: 100vh;
+    }
+
+    .sidebar {
+      width: 250px;
+      background-color: #00796b;
+      color: white;
+      padding: 20px;
+      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .sidebar h2 {
+      margin-bottom: 20px;
+      font-size: 1.5rem;
+      text-align: center;
+    }
+
+    .sidebar a {
+      display: block;
+      color: white;
+      text-decoration: none;
+      padding: 10px;
+      margin-bottom: 10px;
+      transition: background-color 0.3s;
+    }
+
+    .sidebar a:hover {
+      background-color: #004d40;
+    }
+
+    .main-content {
+      flex: 1;
+      padding: 20px;
+    }
+
+    .main-content h1 {
+      color: #00796b;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .booking-list {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .booking-card {
+      background-color: #fff;
+      border-radius: 10px;
+      padding: 15px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s;
+    }
+
+    .booking-card:hover {
+      transform: translateY(-3px);
+    }
+
+    .booking-card h4 {
+      color: #333;
+      margin-bottom: 10px;
+    }
+
+    .booking-card p {
+      color: #555;
+      margin-bottom: 10px;
+    }
+
+    .status {
+      font-weight: bold;
+      padding: 5px 10px;
+      border-radius: 5px;
+      display: inline-block;
+    }
+
+    .active-status {
+      background-color: #d4edda;
+      color: #155724;
+    }
+
+    .completed-status {
+      background-color: #d1ecf1;
+      color: #0c5460;
+    }
+
+    .rejected-status {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+
+    .btn {
+      background-color: #00796b;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      text-decoration: none;
+    }
+
+    .btn:hover {
+      background-color: #004d40;
+    }
+
+    .btn.new-booking {
+      margin-top: 20px;
+      display: inline-block;
+    }
+  </style>
+</head>
+<body>
+  <div class="sidebar">
+    <h2>User Dashboard</h2>
+    <a href="user_dashboard.html">Dashboard</a>
+    <a href="user_bookings.html">Bookings</a>
+    <a href="user_profile.html">Profile</a>
+    <a href="book_status.html.html">Current Booking Status</a>
+    <a href="settings.html">Settings</a>
+  </div>
+
+  <div class="main-content">
+    <h1>Your Bookings</h1>
+
+    <div class="booking-list">
+      <div class="booking-card">
+        <h4>Location: Park Street P</h4>
+        <p>Time: 3:00 PM - 6:00 PM | Date: 29th June 2025</p>
+        <p class="status active-status">Status: Active</p>
+      </div>
+      <div class="booking-card">
+        <h4>Location: Saltee Plaza P</h4>
+        <p>Time: 10:00 AM - 12:00 PM | Date: 28th June 2025</p>
+        <p class="status completed-status">Status: Completed</p>
+      </div>
+      <div class="booking-card">
+        <h4>Location: College More Lot P</h4>
+        <p>Time: 1:00 PM - 2:00 PM | Date: 27th June 2025</p>
+        <p class="status rejected-status">Status: Rejected</p>
+      </div>
+    </div>
+
+    <a class="btn new-booking" href="booking_process.html">+ New Booking</a>
+  </div>
+
+</body>
+</html>

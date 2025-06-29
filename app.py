@@ -174,6 +174,21 @@ def show_reservations():
             'total_cost': r.total_cost
         } for r in all_reservations
     ])
+@app.route('/users/<int:user_id>', methods=['PUT'])
+def update_user(user_id):
+    data = request.get_json()
+    user = User.query.get_or_404(user_id)
+    user.is_banned = data.get('is_banned', user.is_banned)
+    db.session.commit()
+    return jsonify({'message': 'User updated'})
+
+@app.route('/assign_spot', methods=['POST'])
+def assign_spot():
+    data = request.get_json()
+    user_id = data['user_id']
+    spot_id = data['spot_id']
+    # Logic to assign spot goes here
+    return jsonify({'message': 'Spot assigned'})
 
 if __name__ == '__main__':
     app.run(debug=True)
