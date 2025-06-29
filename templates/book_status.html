@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Booking Status</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #e0f7fa, #80deea);
+      margin: 0;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    .status-container {
+      background-color: #ffffff;
+      padding: 40px;
+      border-radius: 10px;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+      max-width: 500px;
+      text-align: center;
+    }
+
+    .status-container h2 {
+      color: #00796b;
+      margin-bottom: 20px;
+    }
+
+    .status-message {
+      font-size: 20px;
+      font-weight: bold;
+      padding: 20px;
+      border-radius: 10px;
+      margin-top: 20px;
+    }
+
+    .confirmed {
+      background-color: #e8f5e9;
+      color: #2e7d32;
+      border: 2px solid #66bb6a;
+    }
+
+    .declined {
+      background-color: #ffebee;
+      color: #c62828;
+      border: 2px solid #ef5350;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="status-container">
+    <h2>Your Booking Status</h2>
+
+    {% if status == 'confirmed' %}
+      <div class="status-message confirmed">
+        Hooray! Your booking has been <strong>CONFIRMED</strong>.<br>
+        We'll see you at <strong>{{ location_name }}</strong> on <strong>{{ date }}</strong> at <strong>{{ time }}</strong>.
+      </div>
+    {% elif status == 'declined' %}
+      <div class="status-message declined">
+        Sorry for the inconvenience. Your booking has been <strong>DECLINED</strong>.<br>
+        Please try selecting a different time or location.
+      </div>
+    {% else %}
+      <div class="status-message">
+        Booking in process. We'll get back shortly!
+      </div>
+    {% endif %}
+  </div>
+
+</body>
+</html>
+
+</html>

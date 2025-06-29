@@ -189,6 +189,14 @@ def assign_spot():
     spot_id = data['spot_id']
     # Logic to assign spot goes here
     return jsonify({'message': 'Spot assigned'})
+@app.route('/booking_status/<booking_id>')
+def booking_status(booking_id):
+    booking = get_booking(booking_id)  # Fetch from DB
+    return render_template('book_status.html',
+                           status=booking.status,
+                           location_name=booking.location_name,
+                           date=booking.date,
+                           time=booking.time)
 
 if __name__ == '__main__':
     app.run(debug=True)
