@@ -51,7 +51,7 @@ class Reservation(db.Model):
 
     # Foreign key to User
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-
+    
     parking_timestamp = db.Column(db.DateTime, default=datetime.utcnow)
     leaving_timestamp = db.Column(db.DateTime, nullable=True)
 
@@ -63,4 +63,6 @@ class Reservation(db.Model):
         if self.leaving_timestamp:
             duration = (self.leaving_timestamp - self.parking_timestamp).total_seconds() / 3600
             self.total_cost = round(duration * self.cost_per_hour, 2)
+            return self.total_cost
+        return 0.0
 #A decent amount of normlization has been done

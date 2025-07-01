@@ -1,8 +1,10 @@
 import os
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, redirect, url_for, flash, session
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from models import db, User, ParkingLot, ParkingSpot, Reservation
+from functools import wraps
+from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__, instance_relative_config=True)#relative config allows Flask to find the instance folder
 
@@ -19,184 +21,360 @@ db.init_app(app)
 # Creating the database tables
 with app.app_context():
     db.create_all()
+def get_lot_by_id(lot_id):
+    return ParkingLot.query.get_or_404(lot_id)
+
+def count_occupied_spots(lot_id):
+    return ParkingSpot.query.filter_by(lot_id=lot_id, status='O').count()
+
+def get_available_spot(lot_id):
+    return ParkingSpot.query.filter_by(lot_id=lot_id, status='A').first()
+
+# Authentication decorator
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'user_id' not in session:
+            flash('Please log in first', 'danger')
+            return redirect(url_for('user_login'))
+        return f(*args, **kwargs)
+    return decorated_function
+
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not session.get('admin_logged_in'):
+            flash('Admin access required', 'danger')
+            return redirect(url_for('admin_login'))
+        return f(*args, **kwargs)
+    return decorated_function
 
 #home route
-
 @app.route('/')
 def home():
     return render_template('index.html')
 
 #users route
-
-
-@app.route('/register_user', methods=['POST'])
+@app.route('/register_user', methods=['GET', 'POST'])
 def register_user():
-    payload = request.get_json()
-    new_user = User(
-        username=payload['username'],
-        password=payload['password'],
-        is_admin=payload.get('is_admin', False)
-    )
-    db.session.add(new_user)
-    db.session.commit()
-    return jsonify({'message': 'User account created', 'user_id': new_user.id}), 201
+        if request.method == 'POST':
+            fullname = request.form['fullname']
+            email = request.form['email']
+            password = generate_password_hash(request.form['password'])
+            dob = datetime.strptime(request.form['dob'], '%Y-%m-%d').date()
+            state = request.form['State']
+        
+            new_user = User(
+               username=fullname,
+               email=email,
+               password=password,
+               dob=dob,
+               state=state
+            )
+            db.session.add(new_user)
+            db.session.commit()
+            flash('Registration successful!', 'success')
+            return redirect(url_for('user_login'))
+        return render_template('register_user.html')
 
-@app.route('/users', methods=['GET'])
-def fetch_all_users():
-    user_list = User.query.all()
-    results = [{
-        'id': u.id,
-        'username': u.username,
-        'is_admin': u.is_admin
-    } for u in user_list]
-    return jsonify(results)
+@app.route('/user_login', methods=['GET', 'POST'])
+def user_login():
+    if request.method == 'POST':
+        email = request.form['email']
+        password = request.form['password']
+        user = User.query.filter_by(email=email).first()
+        
+        if user and check_password_hash(user.password, password):
+            if user.is_banned:
+                flash('Your account has been suspended', 'danger')
+                return redirect(url_for('user_login'))
+            session['user_id'] = user.id
+            return redirect(url_for('user_dashboard'))
+        flash('Invalid credentials', 'danger')
+    return render_template('user_login.html')
 
-@app.route('/users/<int:user_id>', methods=['GET'])
-def fetch_user_by_id(user_id):
-    user = User.query.get_or_404(user_id)
-    return jsonify({
-        'id': user.id,
-        'username': user.username,
-        'is_admin': user.is_admin
-    })
-
-@app.route('/delete_account', methods=['POST'])
+# Admin routes
+@app.route('/admin_login', methods=['GET', 'POST'])
+def admin_login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        if username == 'admin' and password == 'admin123':
+            session['admin_logged_in'] = True
+            return redirect(url_for('admin_dashboard'))
+        flash('Invalid admin credentials', 'danger')
+    return render_template('admin_login.html')
+@app.route('/logout')
+def logout():
+    session.clear()
+    flash('You have been logged out', 'info')
+    return redirect(url_for('home'))
+#dashboard routes
+@app.route('/user_dashboard')
 @login_required
-def delete_account():
-    user = User.query.get(current_user.id)
-    if user:
-        db.session.delete(user)
+def user_dashboard():
+    user = User.query.get(session['user_id'])
+    active_reservations = Reservation.query.filter_by(
+        user_id=user.id, 
+        leaving_timestamp=None
+    ).order_by(Reservation.parking_timestamp.desc()).limit(3).all()
+    
+    return render_template('user_dashboard.html', 
+                          user=user, 
+                          active_reservations=active_reservations)
+@app.route('/admin_dashboard')
+@admin_required
+def admin_dashboard():
+    total_users = User.query.count()
+    total_lots = ParkingLot.query.count()
+    active_reservations = Reservation.query.filter_by(leaving_timestamp=None).count()
+    
+    return render_template('admin_dashboard.html',
+                          total_users=total_users,
+                          total_lots=total_lots,
+                          active_reservations=active_reservations)
+
+#managing the parking lot
+@app.route('/create_lot', methods=['GET', 'POST'])
+def create_lot():
+    if request.method == 'POST':
+        new_lot = ParkingLot(
+            prime_location_name=request.form['prime_location_name'],
+            price_per_hour=float(request.form['price_per_hour']),
+            address=request.form['address'],
+            pin_code=request.form['pin_code'],
+            max_spots=int(request.form['max_spots'])
+        )
+        db.session.add(new_lot)
         db.session.commit()
-        flash("Account deleted successfully.", "info")
-        return redirect(url_for('home'))  # Or login page
-    flash("Something went wrong.", "danger")
-    return redirect(url_for('settings'))
+        for i in range(1, new_lot.max_spots + 1):
+            spot = ParkingSpot(
+                lot_id=new_lot.id,
+                spot_number=f"{new_lot.prime_location_name[:3]}-{i:03d}",
+                status='A'
+            )
+            db.session.add(spot)
+        db.session.commit()
+        flash('Parking lot created successfully!', 'success')
+        return redirect(url_for('manage_lots'))
+    return render_template('create_lot.html')
 
-#parking lot route
-
-@app.route('/lots', methods=['POST'])
-def add_parking_lot():
-    payload = request.get_json()
-    lot = ParkingLot(
-        prime_location_name=payload['prime_location_name'],
-        price_per_hour=payload['price_per_hour'],
-        address=payload['address'],
-        pin_code=payload['pin_code'],
-        max_spots=payload['max_spots']
-    )
-    db.session.add(lot)
-    db.session.commit()
-    return jsonify({'message': 'Congratulations!!! Parking lot added successfully', 'lot_id': lot.id}), 201
+@app.route('/manage_lots')
+@admin_required
+def manage_lots():
+    lots = ParkingLot.query.all()
+    return render_template('manage_lots.html', lots=lots)
 
 @app.route('/edit_lot/<int:lot_id>', methods=['GET', 'POST'])
+@admin_required
 def edit_lot(lot_id):
     lot = get_lot_by_id(lot_id)
     occupied_spots = count_occupied_spots(lot_id)
+    
     if request.method == 'POST':
-        # Handle update logic
-        pass
+        lot.prime_location_name = request.form['prime_location_name']
+        lot.price_per_hour = float(request.form['price_per_hour'])
+        lot.address = request.form['address']
+        lot.pin_code = request.form['pin_code']
+        
+        new_max = int(request.form['max_spots'])
+        if new_max < occupied_spots:
+            flash(f'Cannot reduce spots below {occupied_spots} occupied spots', 'danger')
+            return redirect(url_for('edit_lot', lot_id=lot_id))
+        if new_max > lot.max_spots:
+            for i in range(lot.max_spots + 1, new_max + 1):
+                spot = ParkingSpot(
+                    lot_id=lot.id,
+                    spot_number=f"{lot.prime_location_name[:3]}-{i:03d}",
+                    status='A'
+                )
+                db.session.add(spot)
+        elif new_max < lot.max_spots:
+            # Remove available spots only
+            spots_to_remove = ParkingSpot.query.filter_by(
+                lot_id=lot.id, 
+                status='A'
+            ).limit(lot.max_spots - new_max).all()
+            
+            for spot in spots_to_remove:
+                db.session.delete(spot)
+        lot.max_spots = new_max
+        db.session.commit()
+        flash('Lot updated successfully', 'success')
+        return redirect(url_for('manage_lots'))
+    
     return render_template('edit_lot.html', lot=lot, occupied_spots=occupied_spots)
 
 @app.route('/delete_lot/<int:lot_id>', methods=['GET', 'POST'])
+@admin_required
 def delete_lot(lot_id):
     lot = get_lot_by_id(lot_id)
     occupied_spots = count_occupied_spots(lot_id)
+    
     if request.method == 'POST':
         if occupied_spots == 0:
-            delete_lot_from_db(lot_id)
-            return redirect(url_for('dashboard'))
+            ParkingSpot.query.filter_by(lot_id=lot.id).delete()
+            Reservation.query.filter_by(lot_id=lot.id).delete()
+            db.session.delete(lot)
+            db.session.commit()
+            flash('Lot deleted successfully', 'success')
+            return redirect(url_for('manage_lots'))
+        flash('Cannot delete lot with occupied spots', 'danger')
+    
     return render_template('delete_lot.html', lot=lot, occupied_spots=occupied_spots)
 
+# Booking system
+@app.route('/user_bookings')
+@login_required
+def user_bookings():
+    user = User.query.get(session['user_id'])
+    reservations = Reservation.query.filter_by(user_id=user.id).order_by(
+        Reservation.parking_timestamp.desc()
+    ).all()
+    return render_template('user_bookings.html', reservations=reservations)
 
-@app.route('/lots', methods=['GET'])
-def list_all_lots():
-    lots = ParkingLot.query.all()
-    return jsonify([
-        {
-            'id': l.id,
-            'location_name': l.prime_location_name,
-            'rate': l.price_per_hour,
-            'address': l.address,
-            'pincode': l.pin_code,
-            'total_spots': l.max_spots
-        } for l in lots
-    ])
+@app.route('/booking_process', methods=['GET', 'POST'])
+@login_required
+def booking_process():
+    if request.method == 'POST':
+        # Get form data
+        lot_id = request.form['location']
+        booking_date = datetime.strptime(request.form['date'], '%Y-%m-%d').date()
+        booking_time = datetime.strptime(request.form['time'], '%H:%M').time()
+        
+        # Get available spot
+        spot = get_available_spot(lot_id)
+        if not spot:
+            flash('No available spots at this location', 'danger')
+            return redirect(url_for('booking_process'))
+        
+        # Create reservation
+        new_reservation = Reservation(
+            spot_id=spot.id,
+            user_id=session['user_id'],
+            parking_timestamp=parking_timestamp,
+            cost_per_hour=spot.lot.price_per_hour
+        )
+        spot.status = 'O'  # Mark spot as occupied
+        db.session.add(new_reservation)
+        db.session.commit()
+        
+        return redirect(url_for('booking_status', booking_id=new_reservation.id))
+    return render_template('booking_process.html')
 
-#reservation route
-@app.route('/reservations', methods=['POST'])
-def book_spot():
-    data = request.get_json()
-    selected_spot = ParkingSpot.query.get_or_404(data['spot_id'])
+# Fixed endpoint name conflict
+@app.route('/booking_status/<int:booking_id>')
+@login_required
+def booking_status(booking_id):
+    reservation = Reservation.query.get_or_404(booking_id)
+    
+    if reservation.user_id != session['user_id']:
+        abort(403)
+        
+    return render_template('book_status.html', 
+                           reservation=reservation,
+                           lot=reservation.spot.lot)
 
-    if selected_spot.status == 'O':
-        return jsonify({'error': 'Sorry, this spot is currently occupied. Please select another spot or come back later.'}), 409
-
-    reservation = Reservation(
-        spot_id=selected_spot.id,
-        user_id=data['user_id'],
-        cost_per_hour=data['cost_per_hour']
-    )
-
-    selected_spot.status = 'O'
-    db.session.add(reservation)
-    db.session.commit()
-
-    return jsonify({ 'message': 'Thank You! Your reservation has been created successfully.','reservation_id': reservation.id }), 201
-
-@app.route('/reservations/<int:res_id>/leave', methods=['POST'])
-def finish_parking(res_id):
-    reservation = Reservation.query.get_or_404(res_id)
-
-    if reservation.leaving_timestamp is not None:
-        return jsonify({'error': 'Oops! This reservation has already ended.'}), 400
-
+@app.route('/end_reservation/<int:reservation_id>', methods=['POST'])
+@login_required
+def end_reservation(reservation_id):
+    reservation = Reservation.query.get_or_404(reservation_id)
+    
+    # Security check
+    if reservation.user_id != session['user_id']:
+        abort(403)
+    
     reservation.leaving_timestamp = datetime.utcnow()
     reservation.calculate_total_cost()
     reservation.spot.status = 'A'
-
+    
     db.session.commit()
+    
+    flash(f'Reservation ended. Total cost: ₹{reservation.total_cost}', 'success')
+    return redirect(url_for('user_bookings'))
 
+# API endpoints
+@app.route('/lots', methods=['GET'])
+def get_lots():
+    lots = ParkingLot.query.all()
+    return jsonify([{
+        'id': lot.id,
+        'name': lot.prime_location_name,
+        'price': lot.price_per_hour,
+        'address': lot.address,
+        'pincode': lot.pin_code,
+        'max_spots': lot.max_spots,
+        'available_spots': ParkingSpot.query.filter_by(lot_id=lot.id, status='A').count()
+    } for lot in lots])
+
+@app.route('/lot_details')
+def lot_details():
+    lot_id = request.args.get('lot_id')
+    lot = ParkingLot.query.get(lot_id)
+    if not lot:
+        return jsonify({'error': 'Lot not found'}), 404
+    available_spots = ParkingSpot.query.filter_by(lot_id=lot.id, status='A').count()
     return jsonify({
-        'message': 'Checkout complete.',
-        'final_cost': reservation.total_cost
+        'id': lot.id,
+        'prime_location_name': lot.prime_location_name,
+        'price_per_hour': lot.price_per_hour,
+        'address': lot.address,
+        'pin_code': lot.pin_code,
+        'max_spots': lot.max_spots,
+        'available_spots': available_spots
     })
+# User profile management
+@app.route('/user_profile', methods=['GET', 'POST'])
+@login_required
+def user_profile():
+    user = User.query.get(session['user_id'])
+    
+    if request.method == 'POST':
+        user.username = request.form['username']
+        user.email = request.form['email']
+        db.session.commit()
+        flash('Profile updated successfully', 'success')
+        return redirect(url_for('user_profile'))
+    
+    return render_template('user_profile.html', user=user)
+#delete account route
+@app.route('/delete_account', methods=['POST'])
+@login_required
+def delete_account():
+    user = User.query.get(session['user_id'])
+    if user:
+        Reservation.query.filter_by(user_id=user.id).delete()
+        db.session.delete(user)
+        db.session.commit()
+        session.clear()
+        flash("Account deleted successfully.", "info")
+        return redirect(url_for('home'))
+    flash("Something went wrong.", "danger")
+    return redirect(url_for('settings'))
+# Admin management routes
+@app.route('/manage_users')
+@admin_required
+def manage_users():
+    users = User.query.all()
+    return render_template('manage_users.html', users=users)
 
-@app.route('/reservations', methods=['GET'])
-def show_reservations():
-    all_reservations = Reservation.query.all()
-    return jsonify([
-        {
-            'id': r.id,
-            'user': r.user.username,
-            'spot_number': r.spot.spot_number,
-            'start_time': r.parking_timestamp.isoformat(),
-            'end_time': r.leaving_timestamp.isoformat() if r.leaving_timestamp else None,
-            'total_cost': r.total_cost
-        } for r in all_reservations
-    ])
-@app.route('/users/<int:user_id>', methods=['PUT'])
-def update_user(user_id):
-    data = request.get_json()
-    user = User.query.get_or_404(user_id)
-    user.is_banned = data.get('is_banned', user.is_banned)
-    db.session.commit()
-    return jsonify({'message': 'User updated'})
+@app.route('/ban_user/<int:user_id>', methods=['POST'])
+@admin_required
+def ban_user(user_id):
+    user = User.query.get(user_id)
+    if user:
+        user.is_banned = not user.is_banned
+        db.session.commit()
+        action = "banned" if user.is_banned else "unbanned"
+        flash(f'User {action} successfully', 'success')
+    return redirect(url_for('manage_users'))
 
-@app.route('/assign_spot', methods=['POST'])
-def assign_spot():
-    data = request.get_json()
-    user_id = data['user_id']
-    spot_id = data['spot_id']
-    # Logic to assign spot goes here
-    return jsonify({'message': 'Spot assigned'})
-@app.route('/booking_status/<booking_id>')
-def booking_status(booking_id):
-    booking = get_booking(booking_id)  # Fetch from DB
-    return render_template('book_status.html',
-                           status=booking.status,
-                           location_name=booking.location_name,
-                           date=booking.date,
-                           time=booking.time)
-
+@app.route('/receipts')
+@admin_required
+def receipts():
+    reservations = Reservation.query.filter(
+        Reservation.leaving_timestamp.isnot(None)
+    ).order_by(Reservation.leaving_timestamp.desc()).all()
+    return render_template('receipt.html', reservations=reservations)
 if __name__ == '__main__':
     app.run(debug=True)
