@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parking Lot Details</title>
+    <style>
+        body {
+            background: linear-gradient(135deg, #e0f7fa, #80deea);
+            font-family: Arial, sans-serif;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 500px;
+            margin: 60px auto;
+            padding: 32px 24px;
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+            text-align: center;
+            animation: fadeIn 0.7s;
+        }
+        h2 {
+            color: #00796b;
+            margin-bottom: 24px;
+        }
+        .lot-details {
+            text-align: left;
+            margin: 0 auto;
+            font-size: 1.12em;
+        }
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+        .label {
+            color: #555;
+            font-weight: bold;
+        }
+        .value {
+            color: #222;
+        }
+        .error {
+            color: #d32f2f;
+            margin-top: 30px;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px);}
+            to   { opacity: 1; transform: translateY(0);}
+        }
+        .back-link {
+            display: inline-block;
+            margin-top: 28px;
+            color: #fff;
+            background: #00796b;
+            padding: 10px 26px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+        .back-link:hover {
+            background: #004d40;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Parking Lot Details</h2>
+        <div id="details" class="lot-details">
+        </div>
+        <div id="error" class="error"></div>
+        <a href="booking_process.html" class="back-link">&larr; Back to Booking</a>
+    </div>
+    <script>
+        function getLotIdFromURL() {
+            const params = new URLSearchParams(window.location.search);
+            return params.get('lot_id');
+        }
+
+        function renderDetails(data) {
+            return `
+                <div class="detail-row"><span class="label">ID:</span> <span class="value">${data.id}</span></div>
+                <div class="detail-row"><span class="label">Location:</span> <span class="value">${data.prime_location_name}</span></div>
+                <div class="detail-row"><span class="label">Price/Hour:</span> <span class="value">&#8377;${data.price_per_hour}</span></div>
+                <div class="detail-row"><span class="label">Address:</span> <span class="value">${data.address}</span></div>
+                <div class="detail-row"><span class="label">Pin Code:</span> <span class="value">${data.pin_code}</span></div>
+                <div class="detail-row"><span class="label">Max Spots:</span> <span class="value">${data.max_spots}</span></div>
+            `;
+        }
+
+        async function loadLotDetails() {
+            const lotId = getLotIdFromURL();
+            const detailsDiv = document.getElementById('details');
+            const errorDiv = document.getElementById('error');
+
+            if (!lotId) {
+                errorDiv.textContent = "No lot selected. Please go back and select a parking lot.";
+                return;
+            }
+
+            try {
+                // Fetch lot details from backend
+                const response = await fetch(`/lot_details?lot_id=${encodeURIComponent(lotId)}`);
+                if (!response.ok) throw new Error("Lot not found.");
+                const data = await response.json();
+                detailsDiv.innerHTML = renderDetails(data);
+            } catch (err) {
+                errorDiv.textContent = "Could not load lot details. Please try again.";
+            }
+        }
+        window.onload = loadLotDetails;
+    </script>
+</body>
+</html>

@@ -51,8 +51,14 @@
       font-size: 16px;
     }
 
-    button {
-      width: 100%;
+    .form-buttons {
+      display: flex;
+      gap: 12px;
+    }
+
+    .form-buttons a,
+    .form-buttons button {
+      width: 50%;
       background-color: #00796b;
       color: white;
       border: none;
@@ -60,9 +66,14 @@
       font-size: 16px;
       border-radius: 6px;
       cursor: pointer;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      transition: background-color 0.3s;
     }
 
-    button:hover {
+    .form-buttons a:hover,
+    .form-buttons button:hover {
       background-color: #004d40;
     }
   </style>
@@ -85,19 +96,21 @@
     <label for="time">Booking Time</label>
     <input type="time" id="time" name="time" required />
 
-    <button type="submit">Confirm Booking</button>
+    <div class="form-buttons">
+      <a href="lot_details.html" id="view-details-link">View Details</a>
+      <button type="submit">Confirm Booking</button>
+    </div>
   </form>
 </div>
 
 <script>
   document.addEventListener("DOMContentLoaded", function() {
     const locationDropdown = document.getElementById("location");
-
-    // Fetch available parking lot locations
+    const viewDetailsLink = document.getElementById("view-details-link");
     fetch("/lots")
       .then(response => response.json())
       .then(data => {
-        locationDropdown.innerHTML = ""; // Clear old options
+        locationDropdown.innerHTML = "";
         data.forEach(loc => {
           const option = document.createElement("option");
           option.value = loc.id;
@@ -109,8 +122,26 @@
         console.error("Failed to fetch locations:", error);
         locationDropdown.innerHTML = "<option>Error loading locations</option>";
       });
+    locationDropdown.addEventListener("change", function() {
+      const selectedLot = locationDropdown.value;
+      if (selectedLot) {
+        viewDetailsLink.href = `lot_details.html?lot_id=${encodeURIComponent(selectedLot)}`;
+        viewDetailsLink.removeAttribute("aria-disabled");
+        viewDetailsLink.style.pointerEvents = "auto";
+        viewDetailsLink.style.opacity = "1";
+      } else {
+        viewDetailsLink.href = "lot_details.html";
+        viewDetailsLink.setAttribute("aria-disabled", "true");
+        viewDetailsLink.style.pointerEvents = "none";
+        viewDetailsLink.style.opacity = "0.6";
+      }
+    });
 
-    // Optionally: handle form submission with confirmation
+    //view details is disabled until a location is selected
+    viewDetailsLink.setAttribute("aria-disabled", "true");
+    viewDetailsLink.style.pointerEvents = "none";
+    viewDetailsLink.style.opacity = "0.6";
+
     document.getElementById("booking-form").addEventListener("submit", function(e) {
       const confirmBooking = confirm("Confirm your booking?");
       if (!confirmBooking) e.preventDefault();
