@@ -1,4 +1,3 @@
-
 #Import the object that would help in database creation
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
@@ -11,10 +10,13 @@ db= SQLAlchemy()
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
+    fullname = db.Column(db.String(100), nullable=True)
+    email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(50), nullable=False)
-    is_admin = db.Column(db.Boolean, default=False)  # Admin flag
-
-    #A user may make multiple reservations
+    dob = db.Column(db.Date, nullable=True)
+    state = db.Column(db.String(50), nullable=True)
+    is_admin = db.Column(db.Boolean, default=False)
+    is_banned = db.Column(db.Boolean, default=False)
     reservations = db.relationship('Reservation', backref='user', lazy=True)
 
 

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Quizzes</title>
+    <title>Manage Lots</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -41,6 +41,34 @@
             font-size: 24px;
             color: #333;
         }
+        .btn {
+            background-color: #00796b;
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 16px;
+            margin-right: 8px;
+            transition: background 0.2s;
+            cursor: pointer;
+        }
+        .btn:hover {
+            background-color: #004d40;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 18px;
+        }
+        th, td {
+            padding: 10px 8px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+        }
+        th {
+            background: #f0f4f8;
+        }
         @media screen and (max-width: 768px) {
             .sidebar {
                 width: 200px;
@@ -62,11 +90,53 @@
     </div>
 
     <div class="main-content">
-        <h1>Manage Quizzes</h1>
-        <p>Here you can create, edit, or delete quizzes.</p>
+        <h1>Manage Lots</h1>
+        <p>Here you can create, edit, or delete parking lots.</p>
+        <a href="create_lot.html" class="btn">+ Create New Lot</a>
+
+        <table id="lots-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Location Name</th>
+                    <th>Price/Hour</th>
+                    <th>Address</th>
+                    <th>Pin Code</th>
+                    <th>Max Spots</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
     </div>
 
     <script>
+    fetch('/lots')
+        .then(response => response.json())
+        .then(lots => {
+            const tbody = document.querySelector('#lots-table tbody');
+            tbody.innerHTML = '';
+            lots.forEach(lot => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${lot.id}</td>
+                    <td>${lot.name}</td>
+                    <td>₹${lot.price}</td>
+                    <td>${lot.address}</td>
+                    <td>${lot.pincode}</td>
+                    <td>${lot.max_spots}</td>
+                    <td>
+                        <a href="edit_lot.html?lot_id=${lot.id}" class="btn">Edit</a>
+                        <a href="delete_lot.html?lot_id=${lot.id}" class="btn" style="background:#d32f2f;">Delete</a>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        })
+        .catch(err => {
+            document.querySelector('#lots-table tbody').innerHTML = '<tr><td colspan="7">Failed to load lots.</td></tr>';
+        });
     </script>
 </body>
 </html>

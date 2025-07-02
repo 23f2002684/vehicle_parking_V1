@@ -59,17 +59,27 @@ def home():
 def register_user():
         if request.method == 'POST':
             fullname = request.form['fullname']
+            username = request.form['username']
             email = request.form['email']
             password = generate_password_hash(request.form['password'])
             dob = datetime.strptime(request.form['dob'], '%Y-%m-%d').date()
             state = request.form['State']
-        
+            
+            if User.query.filter_by(username=username).first():
+                flash('Username already taken.', 'danger')
+                return redirect(url_for('register_user'))
+            if User.query.filter_by(email=email).first():
+                flash('Email already registered.', 'danger')
+                return redirect(url_for('register_user'))
+
             new_user = User(
-               username=fullname,
-               email=email,
-               password=password,
-               dob=dob,
-               state=state
+                username=username,
+                fullname=fullname,
+                email=email,
+                password=password,
+                dob=dob,
+                state=state,
+                is_admin=False  # Default to non-admin
             )
             db.session.add(new_user)
             db.session.commit()
@@ -80,10 +90,10 @@ def register_user():
 @app.route('/user_login', methods=['GET', 'POST'])
 def user_login():
     if request.method == 'POST':
-        email = request.form['email']
+        username = request.form['username']
         password = request.form['password']
-        user = User.query.filter_by(email=email).first()
-        
+        user = User.query.filter_by(username=username).first()
+
         if user and check_password_hash(user.password, password):
             if user.is_banned:
                 flash('Your account has been suspended', 'danger')
@@ -99,7 +109,7 @@ def admin_login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        if username == 'admin' and password == 'admin123':
+        if username == 'admin' and password == 'unique1234':
             session['admin_logged_in'] = True
             return redirect(url_for('admin_dashboard'))
         flash('Invalid admin credentials', 'danger')
@@ -259,13 +269,13 @@ def booking_process():
         db.session.add(new_reservation)
         db.session.commit()
         
-        return redirect(url_for('booking_status', booking_id=new_reservation.id))
+        return redirect(url_for('book_status', booking_id=new_reservation.id))
     return render_template('booking_process.html')
 
 # Fixed endpoint name conflict
-@app.route('/booking_status/<int:booking_id>')
+@app.route('/book_status/<int:booking_id>')
 @login_required
-def booking_status(booking_id):
+def book_status(booking_id):
     reservation = Reservation.query.get_or_404(booking_id)
     
     if reservation.user_id != session['user_id']:

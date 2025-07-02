@@ -69,15 +69,15 @@
 <body>
     <div class="sidebar">
         <h2>User Dashboard</h2>
-        <a href="user_dashboard.html">Dashboard</a>
-        <a href="user_bookings.html">Bookings</a>
-        <a href="user_profile.html">Profile</a>
-        <a href="book_status.html">Current Booking Status</a>
-        <a href="settings.html">Settings</a>
+        <a href="{{ url_for('user_dashboard') }}">Dashboard</a>
+        <a href="{{ url_for('user_bookings') }}">Bookings</a>
+        <a href="{{ url_for('user_profile') }}">Profile</a>
+        <a href="{{ url_for('book_status') }}">Current Booking Status</a>
+        <a href="{{ url_for('settings') }}">Settings</a>
     </div>
 
     <div class="main-content">
-        <h1>Welcome to Your Dashboard</h1>
+        <h1>Welcome {{ user.fullname }} to Your Dashboard</h1>
         <div class="card">
             <h3>Your Booking Status</h3>
             <p>Here, you can view the current status of your recent booking</p>
@@ -91,9 +91,21 @@
             <p>Update your personal information, change your password, and manage your account settings.</p>
         </div>
     </div>
-
+    <div class="active-reservations">
+    <h3>Your Active Reservations</h3>
+    {% for res in active_reservations %}
+    <div class="reservation-card">
+        <p><strong>Location:</strong> {{ res.spot.lot.prime_location_name }}</p>
+        <p><strong>Spot:</strong> {{ res.spot.spot_number }}</p>
+        <p><strong>Start Time:</strong> {{ res.parking_timestamp.strftime('%Y-%m-%d %H:%M') }}</p>
+        <a href="{{ url_for('booking_status', booking_id=res.id) }}" class="btn">View Details</a>
+    </div>
+    {% else %}
+    <p>No active reservations</p>
+    {% endfor %}
+    </div>
+    
     <script>
-        
         document.querySelector('.sidebar a').addEventListener('click', function(e) {
             e.preventDefault();
             alert('Navigating to ' + e.target.textContent);

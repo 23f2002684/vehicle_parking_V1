@@ -56,22 +56,16 @@
   <div class="status-container">
     <h2>Your Booking Status</h2>
 
-    {% if status == 'confirmed' %}
-      <div class="status-message confirmed">
-        Hooray! Your booking has been <strong>CONFIRMED</strong>.<br>
-        We'll see you at <strong>{{ location_name }}</strong> on <strong>{{ date }}</strong> at <strong>{{ time }}</strong>.
-      </div>
-    {% elif status == 'declined' %}
-      <div class="status-message declined">
-        Sorry for the inconvenience. Your booking has been <strong>DECLINED</strong>.<br>
-        Please try selecting a different time or location.
-      </div>
-    {% else %}
-      <div class="status-message">
-        Booking in process. We'll get back shortly!
-      </div>
-    {% endif %}
-  </div>
+    <h2>Booking Status: Confirmed</h2>
+    <p><strong>Location:</strong> {{ reservation.spot.lot.prime_location_name }}</p>
+    <p><strong>Spot Number:</strong> {{ reservation.spot.spot_number }}</p>
+    <p><strong>Date:</strong> {{ reservation.parking_timestamp.strftime('%Y-%m-%d') }}</p>
+    <p><strong>Time:</strong> {{ reservation.parking_timestamp.strftime('%H:%M') }}</p>
+    <p><strong>Price/Hour:</strong> ₹{{ reservation.cost_per_hour }}</p>
+    <form action="{{ url_for('end_reservation', reservation_id=reservation.id) }}" method="POST">
+        <button type="submit" class="btn">End Reservation</button>
+    </form>
+</div>
 
 </body>
 </html>
