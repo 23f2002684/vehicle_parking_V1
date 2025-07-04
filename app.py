@@ -182,7 +182,7 @@ def manage_lots():
 @app.route('/edit_lot/<int:lot_id>', methods=['GET', 'POST'])
 @admin_required
 def edit_lot(lot_id):
-    lot = get_lot_by_id(lot_id)
+    lot = ParkingLot.query.get_or_404(lot_id)
     occupied_spots = count_occupied_spots(lot_id)
     
     if request.method == 'POST':
@@ -190,7 +190,6 @@ def edit_lot(lot_id):
         lot.price_per_hour = float(request.form['price_per_hour'])
         lot.address = request.form['address']
         lot.pin_code = request.form['pin_code']
-        
         new_max = int(request.form['max_spots'])
         if new_max < occupied_spots:
             flash(f'Cannot reduce spots below {occupied_spots} occupied spots', 'danger')
@@ -227,8 +226,10 @@ def delete_lot(lot_id):
     
     if request.method == 'POST':
         if occupied_spots == 0:
-            ParkingSpot.query.filter_by(lot_id=lot.id).delete()
-            Reservation.query.filter_by(lot_id=lot.id).delete()
+            spot_ids = [spot.id for spot in ParkingSpot.query.filter_by(lot_id=lot.id).all()]
+            if spot_ids:
+                Reservation.query.filter(Reservation.spot_id.in_(spot_ids)).delete(synchronize_session=False)
+                ParkingSpot.query.filter_by(lot_id=lot.id).delete()
             db.session.delete(lot)
             db.session.commit()
             flash('Lot deleted successfully', 'success')
@@ -253,9 +254,9 @@ def booking_process():
     if request.method == 'POST':
         # Get form data
         lot_id = request.form['location']
-        booking_date = datetime.strptime(request.form['date'], '%Y-%m-%d').date()
-        booking_time = datetime.strptime(request.form['time'], '%H:%M').time()
-        
+        parking_timestamp = datetime.strptime(request.form['parking_timestamp'], '%H:%M')
+        leaving_timestamp = datetime.strptime(request.form['leaving_timestamp'], '%H:%M')
+
         # Get available spot
         spot = get_available_spot(lot_id)
         if not spot:
@@ -267,6 +268,7 @@ def booking_process():
             spot_id=spot.id,
             user_id=session['user_id'],
             parking_timestamp=parking_timestamp,
+            leaving_timestamp=leaving_timestamp,
             cost_per_hour=spot.lot.price_per_hour
         )
         spot.status = 'O'  # Mark spot as occupied
@@ -321,22 +323,15 @@ def get_lots():
         'available_spots': ParkingSpot.query.filter_by(lot_id=lot.id, status='A').count()
     } for lot in lots])
 
-@app.route('/lot_details')
-def lot_details():
-    lot_id = request.args.get('lot_id')
+@app.route('/lot_details/<int:lot_id>')
+@login_required
+def lot_details(lot_id):
     lot = ParkingLot.query.get(lot_id)
     if not lot:
         return jsonify({'error': 'Lot not found'}), 404
     available_spots = ParkingSpot.query.filter_by(lot_id=lot.id, status='A').count()
-    return jsonify({
-        'id': lot.id,
-        'prime_location_name': lot.prime_location_name,
-        'price_per_hour': lot.price_per_hour,
-        'address': lot.address,
-        'pin_code': lot.pin_code,
-        'max_spots': lot.max_spots,
-        'available_spots': available_spots
-    })
+    return render_template('lot_details.html', lot=lot, available_spots=available_spots)
+
 # User profile management
 @app.route('/user_profile', methods=['GET', 'POST'])
 @login_required

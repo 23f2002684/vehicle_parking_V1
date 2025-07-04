@@ -82,10 +82,10 @@
 <body>
     <div class="sidebar">
         <h2>Admin Dashboard</h2>
-        <a href="admin_dashboard.html">Dashboard</a>
-        <a href="manage_users.html">Manage Users</a>
-        <a href="manage_lots.html">Manage Lots</a>
-        <a href="reports.html">Reports</a>
+        <a href="{{ url_for('admin_dashboard') }}">Dashboard</a>
+        <a href="{{ url_for('manage_users') }}">Manage Users</a>
+        <a href="{{ url_for('manage_lots') }}">Manage Lots</a>
+        <a href="{{ url_for('receipts') }}">Receipts</a>
     </div>
 
     <div class="main-content">
@@ -126,8 +126,8 @@
                     <td>${lot.pincode}</td>
                     <td>${lot.max_spots}</td>
                     <td>
-                        <a href="edit_lot.html?lot_id=${lot.id}" class="btn">Edit</a>
-                        <a href="delete_lot.html?lot_id=${lot.id}" class="btn" style="background:#d32f2f;">Delete</a>
+                        <a href="/edit_lot/${lot.id}" class="btn">Edit</a>
+                        <a href="/delete_lot/${lot.id}" class="btn" style="background:#d32f2f;">Delete</a>
                     </td>
                 `;
                 tbody.appendChild(row);

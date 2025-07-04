@@ -65,8 +65,9 @@
     <form action="{{ url_for('end_reservation', reservation_id=reservation.id) }}" method="POST">
         <button type="submit" class="btn">End Reservation</button>
     </form>
+    <a href="{{ url_for('user_bookings') }}" class="btn" style="margin-top:20px;">
+        &larr; Back to Bookings
+    </a>
 </div>
-
 </body>
-</html>
 </html>

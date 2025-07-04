@@ -84,7 +84,7 @@
   <h2>Book a Parking Spot</h2>
   <p>Select your preferred location, date, and time</p>
 
-  <form id="booking-form" action="/submit_booking" method="POST">
+  <form id="booking-form" action="{{ url_for('booking_process') }}" method="POST">
     <label for="location">Select Location</label>
     <select id="location" name="location" required>
       <option value="">Loading locations...</option>
@@ -93,8 +93,12 @@
     <label for="date">Booking Date</label>
     <input type="date" id="date" name="date" required />
 
-    <label for="time">Booking Time</label>
-    <input type="time" id="time" name="time" required />
+    <label for="parking_timestamp">Parking Start</label>
+    <input type="time" id="parking_timestamp" name="parking_timestamp" required>
+
+    <label for="leaving_timestamp">Parking End</label>
+    <input type="time" id="leaving_timestamp" name="leaving_timestamp" required>
+
 
     <div class="form-buttons">
       <a href="lot_details.html" id="view-details-link">View Details</a>
@@ -110,7 +114,7 @@
     fetch("/lots")
       .then(response => response.json())
       .then(data => {
-        locationDropdown.innerHTML = "";
+        locationDropdown.innerHTML = '<option value="" disabled selected>Select a location</option>';
         data.forEach(loc => {
           const option = document.createElement("option");
           option.value = loc.id;
@@ -122,25 +126,23 @@
         console.error("Failed to fetch locations:", error);
         locationDropdown.innerHTML = "<option>Error loading locations</option>";
       });
+    viewDetailsLink.setAttribute("aria-disabled", "true");
+    viewDetailsLink.style.pointerEvents = "none";
+    viewDetailsLink.style.opacity = "0.6";
     locationDropdown.addEventListener("change", function() {
       const selectedLot = locationDropdown.value;
       if (selectedLot) {
-        viewDetailsLink.href = `lot_details.html?lot_id=${encodeURIComponent(selectedLot)}`;
+        viewDetailsLink.href = `/lot_details/${encodeURIComponent(selectedLot)}`;
         viewDetailsLink.removeAttribute("aria-disabled");
         viewDetailsLink.style.pointerEvents = "auto";
         viewDetailsLink.style.opacity = "1";
       } else {
-        viewDetailsLink.href = "lot_details.html";
+        viewDetailsLink.href = "#";
         viewDetailsLink.setAttribute("aria-disabled", "true");
         viewDetailsLink.style.pointerEvents = "none";
         viewDetailsLink.style.opacity = "0.6";
       }
     });
-
-    //view details is disabled until a location is selected
-    viewDetailsLink.setAttribute("aria-disabled", "true");
-    viewDetailsLink.style.pointerEvents = "none";
-    viewDetailsLink.style.opacity = "0.6";
 
     document.getElementById("booking-form").addEventListener("submit", function(e) {
       const confirmBooking = confirm("Confirm your booking?");

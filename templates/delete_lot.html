@@ -52,8 +52,8 @@
     <p>Are you sure you want to delete the lot: <strong>{{ lot.prime_location_name }}</strong>?</p>
     <p><strong>Note:</strong> You can only delete this lot if all parking spots are empty.</p>
     <form method="POST" action="{{ url_for('delete_lot', lot_id=lot.id) }}" id="deleteForm">
-      <button type="submit" class="confirm-btn">Yes, Delete</button>
-      <button type="button" class="cancel-btn" onclick="window.location.href='{{ url_for('dashboard') }}'">Cancel</button>
+      <button type="submit" class="confirm-btn">Yes, Delete Lot</button>
+      <button type="button" class="cancel-btn" onclick="window.location.href='{{ url_for('admin_dashboard') }}'">Cancel</button>
     </form>
   </div>
 

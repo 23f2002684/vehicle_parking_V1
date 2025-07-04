@@ -132,7 +132,7 @@
     <a href="{{ url_for('user_bookings') }}">Bookings</a>
     <a href="{{ url_for('user_profile') }}">Profile</a>
     {% if reservations and reservations|length > 0 %}
-      <a href="{{ url_for('booking_status', booking_id=reservations[0].id) }}">Current Booking Status</a>
+      <a href="{{ url_for('book_status', booking_id=reservations[0].id) }}">Current Booking Status</a>
     {% else %}
       <span><b>No bookings yet</b></span>
     {% endif %}
@@ -173,7 +173,7 @@
             Rejected
           {% endif %}
         </p>
-        <a class="btn" href="{{ url_for('booking_status', booking_id=booking.id) }}">View Details</a>
+        <a class="btn" href="{{ url_for('book_status', booking_id=booking.id) }}">View Details</a>
       </div>
     {% endfor %}
   {% else %}
