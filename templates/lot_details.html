@@ -74,49 +74,20 @@
 <body>
     <div class="container">
         <h2>Parking Lot Details</h2>
-        <div id="details" class="lot-details">
-        </div>
-        <div id="error" class="error"></div>
-        <a href="booking_process.html" class="back-link">&larr; Back to Booking</a>
+        {% if lot %}
+            <ul>
+                <li><strong>Location:</strong> {{ lot.prime_location_name }}</li>
+                <li><strong>Price per hour:</strong> ₹{{ lot.price_per_hour }}</li>
+                <li><strong>Address:</strong> {{ lot.address }}</li>
+                <li><strong>Pin Code:</strong> {{ lot.pin_code }}</li>
+                <li><strong>Max Spots:</strong> {{ lot.max_spots }}</li>
+                <li><strong>Available Spots:</strong> {{ available_spots }}</li>
+            </ul>
+            <a href="{{ url_for('booking_process') }}" class="btn">&larr; Back to Booking</a>
+        {% else %}
+            <div class="error">No lot selected. Please go back and select a parking lot.</div>
+            <a href="{{ url_for('booking_process') }}" class="btn">&larr; Back to Booking</a>
+        {% endif %}
     </div>
-    <script>
-        function getLotIdFromURL() {
-            const params = new URLSearchParams(window.location.search);
-            return params.get('lot_id');
-        }
-
-        function renderDetails(data) {
-            return `
-                <div class="detail-row"><span class="label">ID:</span> <span class="value">${data.id}</span></div>
-                <div class="detail-row"><span class="label">Location:</span> <span class="value">${data.prime_location_name}</span></div>
-                <div class="detail-row"><span class="label">Price/Hour:</span> <span class="value">&#8377;${data.price_per_hour}</span></div>
-                <div class="detail-row"><span class="label">Address:</span> <span class="value">${data.address}</span></div>
-                <div class="detail-row"><span class="label">Pin Code:</span> <span class="value">${data.pin_code}</span></div>
-                <div class="detail-row"><span class="label">Max Spots:</span> <span class="value">${data.max_spots}</span></div>
-            `;
-        }
-
-        async function loadLotDetails() {
-            const lotId = getLotIdFromURL();
-            const detailsDiv = document.getElementById('details');
-            const errorDiv = document.getElementById('error');
-
-            if (!lotId) {
-                errorDiv.textContent = "No lot selected. Please go back and select a parking lot.";
-                return;
-            }
-
-            try {
-                // Fetch lot details from backend
-                const response = await fetch(`/lot_details?lot_id=${encodeURIComponent(lotId)}`);
-                if (!response.ok) throw new Error("Lot not found.");
-                const data = await response.json();
-                detailsDiv.innerHTML = renderDetails(data);
-            } catch (err) {
-                errorDiv.textContent = "Could not load lot details. Please try again.";
-            }
-        }
-        window.onload = loadLotDetails;
-    </script>
 </body>
 </html>

@@ -328,7 +328,7 @@ def get_lots():
 def lot_details(lot_id):
     lot = ParkingLot.query.get(lot_id)
     if not lot:
-        return jsonify({'error': 'Lot not found'}), 404
+        return render_template('lot_details.html', lot=None, error='Lot not found')
     available_spots = ParkingSpot.query.filter_by(lot_id=lot.id, status='A').count()
     return render_template('lot_details.html', lot=lot, available_spots=available_spots)
 
