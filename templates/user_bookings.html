@@ -128,36 +128,62 @@
 <body>
   <div class="sidebar">
     <h2>User Dashboard</h2>
-    <a href="user_dashboard.html">Dashboard</a>
-    <a href="user_bookings.html">Bookings</a>
-    <a href="user_profile.html">Profile</a>
-    <a href="book_status.html.html">Current Booking Status</a>
-    <a href="settings.html">Settings</a>
+    <a href="{{ url_for('user_dashboard') }}">Dashboard</a>
+    <a href="{{ url_for('user_bookings') }}">Bookings</a>
+    <a href="{{ url_for('user_profile') }}">Profile</a>
+    {% if reservations and reservations|length > 0 %}
+      <a href="{{ url_for('booking_status', booking_id=reservations[0].id) }}">Current Booking Status</a>
+    {% else %}
+      <span><b>No bookings yet</b></span>
+    {% endif %}
+
+    <a href="{{ url_for('settings') }}">Settings</a>
   </div>
 
   <div class="main-content">
     <h1>Your Bookings</h1>
 
     <div class="booking-list">
+  {% if reservations and reservations|length > 0 %}
+    {% for booking in reservations %}
       <div class="booking-card">
-        <h4>Location: Park Street P</h4>
-        <p>Time: 3:00 PM - 6:00 PM | Date: 29th June 2025</p>
-        <p class="status active-status">Status: Active</p>
+        <h4>Location: {{ booking.spot.lot.prime_location_name }}</h4>
+        <p>
+          Time: {{ booking.parking_timestamp.strftime('%I:%M %p') }}
+          {% if booking.leaving_timestamp %}
+            - {{ booking.leaving_timestamp.strftime('%I:%M %p') }}
+          {% endif %}
+          | Date: {{ booking.parking_timestamp.strftime('%d %b %Y') }}
+        </p>
+        <p class="status 
+          {% if not booking.leaving_timestamp %}
+            active-status
+          {% elif booking.total_cost > 0 %}
+            completed-status
+          {% else %}
+            rejected-status
+          {% endif %}
+        ">
+          Status:
+          {% if not booking.leaving_timestamp %}
+            Active
+          {% elif booking.total_cost > 0 %}
+            Completed
+          {% else %}
+            Rejected
+          {% endif %}
+        </p>
+        <a class="btn" href="{{ url_for('booking_status', booking_id=booking.id) }}">View Details</a>
       </div>
-      <div class="booking-card">
-        <h4>Location: Saltee Plaza P</h4>
-        <p>Time: 10:00 AM - 12:00 PM | Date: 28th June 2025</p>
-        <p class="status completed-status">Status: Completed</p>
-      </div>
-      <div class="booking-card">
-        <h4>Location: College More Lot P</h4>
-        <p>Time: 1:00 PM - 2:00 PM | Date: 27th June 2025</p>
-        <p class="status rejected-status">Status: Rejected</p>
-      </div>
-    </div>
-
-    <a class="btn new-booking" href="booking_process.html">+ New Booking</a>
+    {% endfor %}
+  {% else %}
+    <p>No bookings found.</p>
+  {% endif %}
   </div>
+</div>
+<div class="new-booking">
+    <a class="btn new-booking" href="{{ url_for('booking_process') }}">+ New Booking</a>
+</div>
 
 </body>
 </html>

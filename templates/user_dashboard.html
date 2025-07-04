@@ -72,7 +72,12 @@
         <a href="{{ url_for('user_dashboard') }}">Dashboard</a>
         <a href="{{ url_for('user_bookings') }}">Bookings</a>
         <a href="{{ url_for('user_profile') }}">Profile</a>
-        <a href="{{ url_for('book_status') }}">Current Booking Status</a>
+        {% if active_reservations and active_reservations|length > 0 %}
+            <a href="{{ url_for('booking_status', booking_id=active_reservations[0].id) }}">Current Booking Status</a>
+        {% else %}
+            <span><b>No bookings yet</b></span>
+        {% endif %}
+
         <a href="{{ url_for('settings') }}">Settings</a>
     </div>
 

@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template, request, jsonify, redirect, url_for, flash, session
+from flask import Flask, render_template, request, jsonify, redirect, url_for, flash, session, abort
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from models import db, User, ParkingLot, ParkingSpot, Reservation
@@ -135,6 +135,7 @@ def user_dashboard():
 @app.route('/admin_dashboard')
 @admin_required
 def admin_dashboard():
+    lots=ParkingLot.query.all()
     total_users = User.query.count()
     total_lots = ParkingLot.query.count()
     active_reservations = Reservation.query.filter_by(leaving_timestamp=None).count()
@@ -142,10 +143,13 @@ def admin_dashboard():
     return render_template('admin_dashboard.html',
                           total_users=total_users,
                           total_lots=total_lots,
-                          active_reservations=active_reservations)
+                          active_reservations=active_reservations,
+                          lots=lots
+                          )
 
 #managing the parking lot
 @app.route('/create_lot', methods=['GET', 'POST'])
+@admin_required
 def create_lot():
     if request.method == 'POST':
         new_lot = ParkingLot(
@@ -166,7 +170,7 @@ def create_lot():
             db.session.add(spot)
         db.session.commit()
         flash('Parking lot created successfully!', 'success')
-        return redirect(url_for('manage_lots'))
+        return redirect(url_for('admin_dashboard'))
     return render_template('create_lot.html')
 
 @app.route('/manage_lots')
@@ -347,20 +351,7 @@ def user_profile():
         return redirect(url_for('user_profile'))
     
     return render_template('user_profile.html', user=user)
-#delete account route
-@app.route('/delete_account', methods=['POST'])
-@login_required
-def delete_account():
-    user = User.query.get(session['user_id'])
-    if user:
-        Reservation.query.filter_by(user_id=user.id).delete()
-        db.session.delete(user)
-        db.session.commit()
-        session.clear()
-        flash("Account deleted successfully.", "info")
-        return redirect(url_for('home'))
-    flash("Something went wrong.", "danger")
-    return redirect(url_for('settings'))
+
 # Admin management routes
 @app.route('/manage_users')
 @admin_required
@@ -386,5 +377,38 @@ def receipts():
         Reservation.leaving_timestamp.isnot(None)
     ).order_by(Reservation.leaving_timestamp.desc()).all()
     return render_template('receipt.html', reservations=reservations)
+
+#settings route
+@app.route('/settings')
+@login_required  # Optional: restrict to logged-in users
+def settings():
+    return render_template('settings.html')
+@app.route('/change_password', methods=['GET', 'POST'])
+@login_required
+def change_password():
+    user = User.query.get(session['user_id'])
+    if request.method == 'POST':
+        new_password = request.form['new_password']
+        user.set_password(new_password)
+        db.session.commit()
+        flash('Password changed successfully', 'success')
+        return redirect(url_for('settings'))
+    return render_template('change_password.html', user=user)
+
+#delete account route
+@app.route('/delete_account', methods=['POST'])
+@login_required
+def delete_account():
+    user = User.query.get(session['user_id'])
+    if user:
+        Reservation.query.filter_by(user_id=user.id).delete()
+        db.session.delete(user)
+        db.session.commit()
+        session.clear()
+        flash("Account deleted successfully.", "info")
+        return redirect(url_for('home'))
+    flash("Something went wrong.", "danger")
+    return redirect(url_for('settings'))
+
 if __name__ == '__main__':
     app.run(debug=True)

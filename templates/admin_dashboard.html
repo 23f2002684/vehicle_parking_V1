@@ -22,30 +22,15 @@
             text-align: center;
             margin-bottom: 20px;
         }
-        .sidebar a, .sidebar .dropdown-btn {
+        .sidebar a {
             color: white;
             padding: 15px;
             text-decoration: none;
             display: block;
             font-size: 18px;
-            border: none;
-            background: none;
-            width: 100%;
-            text-align: left;
-            cursor: pointer;
-            outline: none;
         }
-        .sidebar a:hover, .sidebar .dropdown-btn:hover {
+        .sidebar a:hover {
             background-color: #1e2a38;
-        }
-        .dropdown-container {
-            display: none;
-            background-color: #394867;
-            padding-left: 15px;
-        }
-        .dropdown-container a {
-            font-size: 16px;
-            padding: 10px 15px;
         }
         .main-content {
             margin-left: 250px;
@@ -53,7 +38,7 @@
             width: 100%;
         }
         .main-content h1 {
-            font-size: 24px;
+            font-size: 28px;
             color: #333;
         }
         .btn {
@@ -67,9 +52,16 @@
             margin-right: 8px;
             transition: background 0.2s;
             cursor: pointer;
+            display: inline-block;
         }
         .btn:hover {
             background-color: #004d40;
+        }
+        .btn.delete {
+            background-color: #d32f2f;
+        }
+        .btn.delete:hover {
+            background-color: #a31515;
         }
         table {
             width: 100%;
@@ -97,20 +89,19 @@
 <body>
     <div class="sidebar">
         <h2>Admin Dashboard</h2>
-        <a href="{{url_for('admin_dashboard')}}">Dashboard</a>
-        <a href="{{url_for('manage_users')}}">Manage Users</a>
-        <button class="dropdown-btn">Manage Lots &#9662;</button>
-        <div class="dropdown-container">
-            <a href="{{url_for('create_lot')}}">Create New Lot</a>
-        </div>
-        <a href="{{url_for('reports')}}">Reports</a>
-        <a href="{{url_for('settings')}}">Settings</a>
+        <a href="{{ url_for('admin_dashboard') }}">Dashboard</a>
+        <a href="{{ url_for('manage_users') }}">Manage Users</a>
+        <a href="{{ url_for('manage_lots') }}">Manage Lots</a>
+        <a href="{{ url_for('receipts') }}">Receipts</a>
     </div>
 
     <div class="main-content">
-        <h1>Manage Lots</h1>
-        <p>Here you can create, edit, or delete parking lots.</p>
-        <table id="lots-table">
+        <h1>Welcome, Admin!</h1>
+        <p>Here you can view stats and manage parking lots.</p>
+        <a href="{{ url_for('create_lot') }}" class="btn">+ Create New Lot</a>
+
+        <h2 style="margin-top: 32px;">Parking Lots</h2>
+        <table>
             <thead>
                 <tr>
                     <th>ID</th>
@@ -123,41 +114,28 @@
                 </tr>
             </thead>
             <tbody>
+                {% if lots and lots|length > 0 %}
+                    {% for lot in lots %}
+                        <tr>
+                            <td>{{ lot.id }}</td>
+                            <td>{{ lot.prime_location_name }}</td>
+                            <td>₹{{ lot.price_per_hour }}</td>
+                            <td>{{ lot.address }}</td>
+                            <td>{{ lot.pin_code }}</td>
+                            <td>{{ lot.max_spots }}</td>
+                            <td>
+                                <a href="{{ url_for('edit_lot', lot_id=lot.id) }}" class="btn">Edit</a>
+                                <a href="{{ url_for('delete_lot', lot_id=lot.id) }}" class="btn delete">Delete</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="7">No parking lots found.</td>
+                    </tr>
+                {% endif %}
             </tbody>
         </table>
     </div>
-
-    <script>
-    document.querySelector('.dropdown-btn').addEventListener('click', function() {
-        this.classList.toggle('active');
-        var dropdownContent = this.nextElementSibling;
-        dropdownContent.style.display = dropdownContent.style.display === "block" ? "none" : "block";
-    });
-    fetch('/lots')
-        .then(response => response.json())
-        .then(lots => {
-            const tbody = document.querySelector('#lots-table tbody');
-            tbody.innerHTML = '';
-            lots.forEach(lot => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${lot.id}</td>
-                    <td>${lot.name}</td>
-                    <td>₹${lot.price}</td>
-                    <td>${lot.address}</td>
-                    <td>${lot.pincode}</td>
-                    <td>${lot.max_spots}</td>
-                    <td>
-                        <a href="{{url_for('edit_lot', lot_id=lot.id)}}" class="btn">Edit</a>
-                        <a href="{{url_for('delete_lot', lot_id=lot.id)}}" class="btn" style="background:#d32f2f;">Delete</a>
-                    </td>
-                `;
-                tbody.appendChild(row);
-            });
-        })
-        .catch(err => {
-            document.querySelector('#lots-table tbody').innerHTML = '<tr><td colspan="7">Failed to load lots.</td></tr>';
-        });
-    </script>
 </body>
 </html>
