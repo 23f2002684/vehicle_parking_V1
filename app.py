@@ -243,10 +243,8 @@ def delete_lot(lot_id):
 @login_required
 def user_bookings():
     user = User.query.get(session['user_id'])
-    reservations = Reservation.query.filter_by(user_id=user.id).order_by(
-        Reservation.parking_timestamp.desc()
-    ).all()
-    return render_template('user_bookings.html', reservations=reservations)
+    reservations = Reservation.query.filter_by(user_id=session['user_id']).all()
+    return render_template('user_bookings.html', reservations=reservations, now=datetime.utcnow(), user=user)
 
 @app.route('/booking_process', methods=['GET', 'POST'])
 @login_required
@@ -254,28 +252,30 @@ def booking_process():
     if request.method == 'POST':
         # Get form data
         lot_id = request.form['location']
-        parking_timestamp = datetime.strptime(request.form['parking_timestamp'], '%H:%M')
-        leaving_timestamp = datetime.strptime(request.form['leaving_timestamp'], '%H:%M')
+        parking_timestamp = datetime.strptime(request.form['parking_timestamp'], '%Y-%m-%dT%H:%M')
+        leaving_timestamp = datetime.strptime(request.form['leaving_timestamp'], '%Y-%m-%dT%H:%M')
 
         # Get available spot
         spot = get_available_spot(lot_id)
-        if not spot:
+        # Create reservation
+        if spot:
+            new_reservation = Reservation(
+                spot_id=spot.id,
+                user_id=session['user_id'],
+                parking_timestamp=parking_timestamp,
+                leaving_timestamp=leaving_timestamp,
+                cost_per_hour=spot.lot.price_per_hour,
+                status="Confirmed"
+            )
+            new_reservation.calculate_total_cost()
+            spot.status = 'O'  # Mark spot as occupied
+            db.session.add(new_reservation)
+            db.session.commit()
+            flash('Booking successful!', 'success')
+            return redirect(url_for('book_status', booking_id=new_reservation.id))
+        else:
             flash('No available spots at this location', 'danger')
             return redirect(url_for('booking_process'))
-        
-        # Create reservation
-        new_reservation = Reservation(
-            spot_id=spot.id,
-            user_id=session['user_id'],
-            parking_timestamp=parking_timestamp,
-            leaving_timestamp=leaving_timestamp,
-            cost_per_hour=spot.lot.price_per_hour
-        )
-        spot.status = 'O'  # Mark spot as occupied
-        db.session.add(new_reservation)
-        db.session.commit()
-        
-        return redirect(url_for('book_status', booking_id=new_reservation.id))
     return render_template('booking_process.html')
 
 # Fixed endpoint name conflict
@@ -289,7 +289,23 @@ def book_status(booking_id):
         
     return render_template('book_status.html', 
                            reservation=reservation,
-                           lot=reservation.spot.lot)
+                           lot=reservation.spot.lot,
+                           now=datetime.utcnow())
+    
+@app.route('/cancel_booking/<int:booking_id>', methods=['POST'])
+@login_required
+def cancel_booking(booking_id):
+    booking = Reservation.query.get_or_404(booking_id)
+    if booking.user_id != session['user_id']:
+        abort(403)
+    if booking.status not in ["Completed", "Cancelled", "Rejected"]:
+        booking.status = "Cancelled"
+        # Optionally free up the spot if needed:
+        if booking.spot.status == 'O':
+            booking.spot.status = 'A'
+        db.session.commit()
+        flash('Booking cancelled.', 'warning')
+    return redirect(url_for('user_bookings'))
 
 @app.route('/end_reservation/<int:reservation_id>', methods=['POST'])
 @login_required

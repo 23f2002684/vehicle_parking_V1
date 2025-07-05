@@ -59,6 +59,7 @@ class Reservation(db.Model):
 
     cost_per_hour = db.Column(db.Float, nullable=False)
     total_cost = db.Column(db.Float, default=0.0)
+    status = db.Column(db.String(20), default='Pending')
 
     # Method to compute total bill after leaving
     def calculate_total_cost(self):

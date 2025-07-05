@@ -38,16 +38,45 @@
       margin-top: 20px;
     }
 
-    .confirmed {
+    .status.pending {
+    background-color: #fffde7;
+    color: #f9a825;
+    border: 2px solid #fbc02d;
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-weight: bold;
+  }
+
+    .status.confirmed {
       background-color: #e8f5e9;
       color: #2e7d32;
       border: 2px solid #66bb6a;
     }
 
-    .declined {
+    .status.completed {
+      background-color: #e3f0fd;
+      color: #1565c0;
+      border: 2px solid #2196f3;
+    }
+
+    .status.rejected {
       background-color: #ffebee;
       color: #c62828;
       border: 2px solid #ef5350;
+    }
+    .back-btn {
+      display: inline-block;
+      margin-top: 24px;
+      padding: 10px 22px;
+      background: #00796b;
+      color: #fff;
+      border-radius: 6px;
+      text-decoration: none;
+      font-size: 16px;
+      transition: background 0.2s;
+    }
+    .back-btn:hover {
+      background: #004d40;
     }
   </style>
 </head>
@@ -55,19 +84,35 @@
 
   <div class="status-container">
     <h2>Your Booking Status</h2>
+    {% if reservation.status == "Rejected" %}
+      <div class="status-message rejected">
+        Sorry, your booking was <strong>REJECTED</strong>.<br>
+        Please try selecting a different time or location.
+      </div>
+    {% elif reservation.status == "Pending" %}
+      <span class="status pending">Status: Pending</span>
+    {% elif reservation.leaving_timestamp and reservation.leaving_timestamp < now %}
+      <div class="status-message completed">
+        Your booking at <strong>{{ reservation.spot.lot.prime_location_name }}</strong> is <strong>COMPLETED</strong>.<br>
+        <span>
+          From <strong>{{ reservation.parking_timestamp.strftime('%d %b %Y, %I:%M %p') }}</strong>
+          to <strong>{{ reservation.leaving_timestamp.strftime('%d %b %Y, %I:%M %p') }}</strong>
+        </span>
+        <br>
+        <span>Total Cost: ₹{{ reservation.total_cost }}</span>
+      </div>
+    {% else %}
+      <div class="status-message confirmed">
+        Hooray! Your booking is <strong>CONFIRMED</strong>.<br>
+        Location: <strong>{{ reservation.spot.lot.prime_location_name }}</strong><br>
+        Date: <strong>{{ reservation.parking_timestamp.strftime('%d %b %Y') }}</strong><br>
+        Time: <strong>{{ reservation.parking_timestamp.strftime('%I:%M %p') }}</strong>
+        <br>
+        <span>Total Cost: ₹{{ reservation.total_cost }}</span>
+      </div>
+    {% endif %}
 
-    <h2>Booking Status: Confirmed</h2>
-    <p><strong>Location:</strong> {{ reservation.spot.lot.prime_location_name }}</p>
-    <p><strong>Spot Number:</strong> {{ reservation.spot.spot_number }}</p>
-    <p><strong>Date:</strong> {{ reservation.parking_timestamp.strftime('%Y-%m-%d') }}</p>
-    <p><strong>Time:</strong> {{ reservation.parking_timestamp.strftime('%H:%M') }}</p>
-    <p><strong>Price/Hour:</strong> ₹{{ reservation.cost_per_hour }}</p>
-    <form action="{{ url_for('end_reservation', reservation_id=reservation.id) }}" method="POST">
-        <button type="submit" class="btn">End Reservation</button>
-    </form>
-    <a href="{{ url_for('user_bookings') }}" class="btn" style="margin-top:20px;">
-        &larr; Back to Bookings
-    </a>
-</div>
+    <a href="{{ url_for('user_bookings') }}" class="back-btn">&larr; Back to My Bookings</a>
+  </div>
 </body>
 </html>

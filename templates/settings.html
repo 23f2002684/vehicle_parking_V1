@@ -156,11 +156,11 @@
 <body>
     <div class="sidebar">
         <h2>User Dashboard</h2>
-        <a href="user_dashboard.html">Dashboard</a>
-        <a href="user_quizzes.html">Quizzes</a>
-        <a href="user_profile.html">Profile</a>
-        <a href="user_results.html">Results</a>
-        <a href="settings.html">Settings</a>
+        <a href="{{url_for('user_dashboard')}}">Dashboard</a>
+        <a href="{{url_for('user_bookings')}}">Bookings</a>
+        <a href="{{url_for('user_profile')}}">Profile</a>
+        <a href="{{url_for('book_status', booking_id=reservation[0].id)}}">Current Booking Status</a>
+        <a href="{{url_for('settings')}}">Settings</a>
     </div>
     <div class="main-content">
         <h1>Settings</h1>
