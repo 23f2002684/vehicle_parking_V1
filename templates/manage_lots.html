@@ -69,12 +69,26 @@
         th {
             background: #f0f4f8;
         }
+        .logo-container {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            text-align: right;
+        }
+        .logo-container img {
+            height: 90px;
+            width: 90px;
+        }
         @media screen and (max-width: 768px) {
             .sidebar {
                 width: 200px;
             }
             .main-content {
                 margin-left: 200px;
+            }
+            .logo-container {
+                top: 5px;
+                right: 5px;
             }
         }
     </style>
@@ -89,6 +103,9 @@
     </div>
 
     <div class="main-content">
+        <div class="logo-container">
+            <img src="{{ url_for('static', filename='../static/images/parker_avenue_logo.png') }}" alt=" ">
+        </div>
         <h1>Manage Lots</h1>
         <p>Here you can create, edit, or delete parking lots.</p>
         <table id="lots-table">

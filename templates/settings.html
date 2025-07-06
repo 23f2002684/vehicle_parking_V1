@@ -42,6 +42,20 @@
             color: #333;
             margin-bottom: 20px
         }
+        .settings-flex-row {
+            display: flex;
+            flex-direction: row;
+            align-items: flex-start;
+            justify-content: flex-end;
+            width: 100%;
+        }
+        .setting-container {
+            display: flex;
+            flex-direction: column;
+            margin-right: 80px;
+            min-width: 340px;
+            max-width: 360px;
+        }
         .setting-section {
             background: #f4f4f4;
             border-radius: 10px;
@@ -128,6 +142,7 @@
             float: right;
             font-size: 20px;
             cursor: pointer;
+        }
         .help-form textarea {
             width: 100%;
             padding: 10px;
@@ -136,20 +151,59 @@
             height: 100px;
             border: 1px solid #ccc;
             border-radius: 5px;
+        }
         .delete-button {
-        background-color: #d32f2f;
+            background-color:rgb(219, 72, 67);
         }
         .delete-button:hover {
-        background-color: #a31515;
+            background-color: #a31515;
         }
-    
-        @media screen and (max-width: 768px) {
-            .sidebar {
-                width: 200px;
+        .logo-container {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            text-align: right;
+        }
+        .logo-container img {
+            height: auto;
+            width: 90px;
+        }
+        @media screen and (max-width: 900px) {
+            .settings-flex-row {
+                flex-direction: column;
+                align-items: flex-end;
             }
+            .setting-container {
+                margin-right: 20px;
+            }
+            .logo-container {
+                margin-top: 5px;
+                margin-bottom: 30px;
+            }
+        }
+        @media screen and (max-width: 600px) {
             .main-content {
-                margin-left: 200px;
-            }    
+                margin-left: 0;
+                padding: 16px 0 0 0;
+            }
+            .sidebar {
+                position: static;
+                width: 100%;
+                height: auto;
+            }
+            .settings-flex-row {
+                flex-direction: column;
+                align-items: flex-end;
+            }
+            .setting-container {
+                width: 100%;
+                min-width: 0;
+                margin-right: 0;
+            }
+            .logo-container img {
+                width: 80px;
+                height: 80px;
+            }
         }
     </style>
 </head>
@@ -159,71 +213,95 @@
         <a href="{{url_for('user_dashboard')}}">Dashboard</a>
         <a href="{{url_for('user_bookings')}}">Bookings</a>
         <a href="{{url_for('user_profile')}}">Profile</a>
-        <a href="{{url_for('book_status', booking_id=reservation[0].id)}}">Current Booking Status</a>
+        {% if reservations and reservations|length > 0 %}
+            <a href="{{ url_for('book_status', booking_id=reservations[0].id) }}">Booking Status</a>
+        {% else %}
+            <span><b>No bookings yet</b></span>
+        {% endif %}
         <a href="{{url_for('settings')}}">Settings</a>
     </div>
     <div class="main-content">
         <h1>Settings</h1>
-        <p>Change the system settings here.</p>
+        <p>Change the platform settings here.</p>
+        <div class="settings-flex-row">
+            <div class="setting-container">
+                <div class="setting-section">
+                    <h3>Account Information</h3>
+                    <p>Email: {{ user.email }}</p>
+                    <p>Username: {{ user.username }}</p>
+                </div>
+                <div class="setting-section">
+                    <h3>Appearance</h3>
+                    <label>Dark Mode:
+                        <label class="switch">
+                            <input type="checkbox" id="darkToggle">
+                            <span class="slider"></span>
+                        </label>
+                    </label>
+                </div>
+                <div class="setting-section">
+                    <h3>Notifications</h3>
+                    <label>Enable Email Alerts:
+                        <label class="switch">
+                            <input type="checkbox" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </label>
+                </div>
+                <div class="setting-section">
+                    <h3>Security</h3>
+                    <button class="button" onclick="openModal()">Change Password</button>
+                </div>
+                <div class="setting-section">
+                    <h3>Ask for Help</h3>
+                    <form class="help-form" onsubmit="handleHelp(event)">
+                        <textarea placeholder="Describe your issue or question..."></textarea>
+                        <div>
+                        <button class="button" type="submit">Submit</button>
+                        </div>
+                    </form>
+                    <p id="help-response" style="color: green;"></p>
+                </div>
+                <div class="setting-section">
+                    <h3>Logout</h3>
+                    <p>This will log you out of the platform.</p>
+                    <p>Wish to continue?</p>
+                    <form action="{{ url_for('logout') }}" method="POST" style="display:inline;">
+                        <button class="logout-button" type="submit">Logout</button>
+                    </form>
+                </div>
+                <div class="setting-section">
+                    <h3>Delete Account</h3>
+                    <p>This action is irreversible. All your data will be permanently deleted.</p>
+                    <button class="delete-button" onclick="openDeleteModal()">Delete My Account</button>
+                </div>
+                <div id="passwordmodal" class="modal">
+                    <div class="modal-content">
+                        <span class="close" onclick="closeModal()">&times;</span>
+                        <h3>Change Password</h3>
+                        <input type="password" placeholder="Current Password">
+                        <input type="password" placeholder="New Password">
+                        <input type="password" placeholder="Confirm New Password">
+                        <button class="button">Update Password</button>
+                    </div>
+                </div>
+                <div id="deletemodal" class="modal">
+                    <div class="modal-content">
+                        <span class="close" onclick="closeDeleteModal()">&times;</span>
+                        <h3>Confirm Account Deletion</h3>
+                        <p>Are you sure you want to delete your account? This cannot be undone.</p>
+                        <form method="POST" action="{{ url_for('delete_account') }}">
+                            <button class="delete-button" type="submit">Yes, Delete My Account</button>
+                            <button class="button" type="button" onclick="closeDeleteModal()">Cancel</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="logo-container">
+                <img src="{{ url_for('static', filename='images/parker_avenue_logo.png') }}" alt="Parker Avenue Logo">
+            </div>
+        </div>
     </div>
-    <div class="setting-section">
-            <h3>Appearance</h3>
-            <label>Dark Mode:
-                <label class="switch">
-                    <input type="checkbox" id="darkToggle">
-                    <span class="slider"></span>
-                </label>
-            </label>
-        </div>
-        <div class="setting-section">
-            <h3>Notifications</h3>
-            <label>Enable Email Alerts:
-                <label class="switch">
-                    <input type="checkbox" checked>
-                    <span class="slider"></span>
-                </label>
-            </label>
-        </div>
-        <div class="setting-section">
-            <h3>Security</h3>
-            <button class="button" onclick="openModal()">Change Password</button>
-        </div>
-        <div class="setting-section">
-            <h3>Ask for Help</h3>
-            <form class="help-form" onsubmit="handleHelp(event)">
-                <textarea placeholder="Describe your issue or question..."></textarea>
-                <button class="button" type="submit">Submit</button>
-            </form>
-            <p id="help-response" style="color: green;"></p>
-        </div>
-        <div class="setting-section">
-            <h3>Delete Account</h3>
-            <p>This action is irreversible. All your data will be permanently deleted.</p>
-            <button class="delete-button" onclick="openDeleteModal()">Delete My Account</button>
-        </div>
-    <div id="passwordmodal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal()">&times;</span>
-            <h3>Change Password</h3>
-            <input type="password" placeholder="Current Password">
-            <input type="password" placeholder="New Password">
-            <input type="password" placeholder="Confirm New Password">
-            <button class="button">Update Password</button>
-        </div>
-    </div>
-
-    <div id="deletemodal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeDeleteModal()">&times;</span>
-            <h3>Confirm Account Deletion</h3>
-            <p>Are you sure you want to delete your account? This cannot be undone.</p>
-            <form method="POST" action="{{ url_for('delete_account') }}">
-                <button class="delete-button" type="submit">Yes, Delete My Account</button>
-                <button class="button" type="button" onclick="closeDeleteModal()">Cancel</button>
-            </form>
-        </div>
-    </div>
-
     <script>
         const darkToggle = document.getElementById('darkToggle');
         darkToggle.addEventListener('change', () => {

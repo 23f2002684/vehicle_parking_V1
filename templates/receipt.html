@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Online Fee Receipt</title>
+    <title>Online Parking Receipts</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -64,6 +64,16 @@
         .print-btn:hover {
             background-color: #0f7d7d;
         }
+        .logo-container {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            text-align: right;
+        }
+        .logo-container img {
+            height: 90px;
+            width: 90px;
+        }
         @media screen and (max-width: 768px) {
             .sidebar {
                 width: 200px;
@@ -71,21 +81,27 @@
             .main-content {
                 margin-left: 200px;
             }
+            .logo-container {
+                top: 5px;
+                right: 5px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="sidebar">
         <h2>Admin Dashboard</h2>
-        <a href="admin_dashboard.html">Dashboard</a>
-        <a href="manage_users.html">Manage Users</a>
-        <a href="manage_lots.html">Manage Lots</a>
-        <a href="receipt.html">Online Fee Receipt</a>
-        <a href="settings.html">Settings</a>
+        <a href="{{ url_for('admin_dashboard') }}">Dashboard</a>
+        <a href="{{ url_for('manage_users') }}">Manage Users</a>
+        <a href="{{ url_for('manage_lots') }}">Manage Lots</a>
+        <a href="{{ url_for('receipts') }}">Online Parking Receipts</a>
     </div>
 
     <div class="main-content">
-        <h1>Online Fee Receipts</h1>
+        <div class="logo-container">
+            <img src="{{ url_for('static', filename='../static/images/parker_avenue_logo.png') }}" alt=" ">
+        </div>
+        <h1>Online Parking Receipts</h1>
         <p>Below are the generated receipts for recent parking activity.</p>
 
         <table id="receiptTable">
@@ -99,37 +115,19 @@
                 </tr>
             </thead>
             <tbody>
-                <!--sample data-->
+                {% for receipt in receipts %}
+                <tr>
+                    <td>{{ receipt.username }}</td>
+                    <td>{{ receipt.parking_spot }}</td>
+                    <td>{{ receipt.hours_parked }}</td>
+                    <td>{{ receipt.rate_per_hour }}</td>
+                    <td>{{ receipt.total_amount }}</td>
+                </tr>
+                {% endfor %}
             </tbody>
         </table>
 
         <button class="print-btn" onclick="window.print()">Print/Download</button>
     </div>
-
-    <script>
-        // Simulated receipt data
-        const receipts = [
-            { username: "rahul_23", spot: "P101", hours: 3, rate: 40 },
-            { username: "Mohit.sur95", spot: "P102", hours: 5, rate: 50 },
-            { username: "Shyam_RD", spot: "P205", hours: 2, rate: 60 },
-            { username: "Payal_A", spot: "P301", hours: 1, rate: 100 }
-            { username: "Anjali_909", spot: "P404", hours: 4, rate: 25 }
-        ];
-
-        const tbody = document.querySelector("#receiptTable tbody");
-
-        receipts.forEach(entry => {
-            const total = entry.hours * entry.rate;
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${entry.username}</td>
-                <td>${entry.spot}</td>
-                <td>${entry.hours}</td>
-                <td>₹${entry.rate}</td>
-                <td><strong>₹${total}</strong></td>
-            `;
-            tbody.appendChild(row);
-        });
-    </script>
 </body>
 </html>

@@ -13,7 +13,7 @@
         .sidebar {
             width: 250px;
             background-color: #2f3b52;
-            color: #fff;
+            color: rgba(253, 254, 250, 0.8);
             padding-top: 20px;
             height: 100vh;
             position: fixed;
@@ -42,7 +42,7 @@
             color: #333;
         }
         .profile-form {
-            background-color: #f9f9f9;
+            background-color:rgb(249, 249, 249);
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -56,19 +56,67 @@
             border: 1px solid #ccc;
             border-radius: 5px;
         }
+        .logo-container {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            text-align: right;
+    }
+    .logo-container img {
+            height: 90px;
+            width: 90px;
+    }
+    .alert-success {
+            color: green;
+            margin-top: 10px;
+        }
+        button {
+            background-color: #00796b;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #004d40;
+        }
+    @media screen and (max-width: 768px) {
+        .sidebar {
+            width: 200px;
+        }
+        .main-content {
+            margin-left: 200px;
+        }
+        .profile-form {
+            width: 90%;
+        }
+        .logo-container {
+                top: 5px;
+                right: 5px;
+        }
+    }
     </style>
 </head>
 <body>
     <div class="sidebar">
         <h2>User Dashboard</h2>
-        <a href="user_dashboard.html">Dashboard</a>
-        <a href="user_bookings.html">Bookings</a>
-        <a href="user_profile.html">Profile</a>
-        <a href="book_status.html">Current Booking Status</a>
-        <a href="settings.html">Settings</a>
+        <a href="{{ url_for('user_dashboard') }}">Dashboard</a>
+        <a href="{{ url_for('user_bookings') }}">Bookings</a>
+        <a href="{{ url_for('user_profile') }}">Profile</a>
+        {% if reservations and reservations|length > 0 %}
+            <a href="{{ url_for('book_status', booking_id=reservations[0].id) }}">Booking Status</a>
+        {% else %}
+            <span><b>No bookings yet</b></span>
+        {% endif %}
+        <a href="{{ url_for('settings') }}">Settings</a>
     </div>
 
     <div class="main-content">
+        <div class="logo-container">
+            <img src="{{ url_for('static', filename='../static/images/parker_avenue_logo.png') }}" alt=" ">
+        </div>
         <h1>Your Profile</h1>
         <div class="profile-form">
             <form action="/update_profile" method="POST">
@@ -78,10 +126,17 @@
                 <label for="email">Email:</label>
                 <input type="email" id="email" name="email" value="{{ user.email }}" required>
 
-                <label for="password">Password:</label>
-                <input type="password" id="password" name="password" value="{{ user.password }}" required>
+                <label for="full-name">Full Name:</label>
+                <input type="text" id="full-name" name="full-name" value="{{ user.fullname }}" required>
 
                 <button type="submit">Update Profile</button>
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }}">{{ message }}</div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
             </form>
         </div>
     </div>

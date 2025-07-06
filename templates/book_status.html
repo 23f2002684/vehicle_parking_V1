@@ -78,10 +78,34 @@
     .back-btn:hover {
       background: #004d40;
     }
+    .logo-container {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      text-align: right;
+    }
+    .logo-container img {
+      height: 100px;
+      width: 100px;
+    }
+    @media screen and (max-width: 768px) {
+      .sidebar {
+      width: 200px;
+      }
+    .main-content {
+      margin-left: 200px;
+      }
+    .logo-container {
+      top: 5px;
+      right: 5px;
+      }
+    }
   </style>
 </head>
 <body>
-
+  <div class="logo-container">
+            <img src="{{ url_for('static', filename='../static/images/parker_avenue_logo.png') }}" alt=" ">
+  </div>
   <div class="status-container">
     <h2>Your Booking Status</h2>
     {% if reservation.status == "Rejected" %}
@@ -111,7 +135,6 @@
         <span>Total Cost: ₹{{ reservation.total_cost }}</span>
       </div>
     {% endif %}
-
     <a href="{{ url_for('user_bookings') }}" class="back-btn">&larr; Back to My Bookings</a>
   </div>
 </body>

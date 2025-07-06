@@ -76,12 +76,33 @@
         th {
             background: #f0f4f8;
         }
+        .setting-section {
+            text-align: right;
+            margin-right: 20px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+        }
+        .logo-container {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            text-align: right;
+        }
+        .logo-container img {
+            height: 90px;
+            width: 90px;
+        }
         @media screen and (max-width: 768px) {
             .sidebar {
                 width: 200px;
             }
             .main-content {
                 margin-left: 200px;
+            }
+            .logo-container {
+                top: 5px;
+                right: 5px;
             }
         }
     </style>
@@ -96,9 +117,19 @@
     </div>
 
     <div class="main-content">
+        <div class="logo-container">
+            <img src="{{ url_for('static', filename='../static/images/parker_avenue_logo.png') }}" alt=" ">
+        </div>
         <h1>Welcome, Admin!</h1>
         <p>Here you can view stats and manage parking lots.</p>
         <a href="{{ url_for('create_lot') }}" class="btn">+ Create New Lot</a>
+        <div class="setting-section">
+                    <h3>Logout</h3>
+                    <p>Once logged out, you will need to login again to access the admin dashboard.</p>
+                    <form action="{{ url_for('logout') }}" method="POST" style="display:inline;">
+                        <button class="logout-button" type="submit">Logout</button>
+                    </form>
+        </div>
 
         <h2 style="margin-top: 32px;">Parking Lots</h2>
         <table>

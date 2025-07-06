@@ -114,11 +114,7 @@ def admin_login():
             return redirect(url_for('admin_dashboard'))
         flash('Invalid admin credentials', 'danger')
     return render_template('admin_login.html')
-@app.route('/logout')
-def logout():
-    session.clear()
-    flash('You have been logged out', 'info')
-    return redirect(url_for('home'))
+
 #dashboard routes
 @app.route('/user_dashboard')
 @login_required
@@ -278,7 +274,6 @@ def booking_process():
             return redirect(url_for('booking_process'))
     return render_template('booking_process.html')
 
-# Fixed endpoint name conflict
 @app.route('/book_status/<int:booking_id>')
 @login_required
 def book_status(booking_id):
@@ -353,15 +348,26 @@ def lot_details(lot_id):
 @login_required
 def user_profile():
     user = User.query.get(session['user_id'])
-    
+    reservations= Reservation.query.filter_by(user_id=user.id).all()
     if request.method == 'POST':
         user.username = request.form['username']
         user.email = request.form['email']
+        user.fullname = request.form['full-name']
         db.session.commit()
         flash('Profile updated successfully', 'success')
         return redirect(url_for('user_profile'))
-    
-    return render_template('user_profile.html', user=user)
+    return render_template('user_profile.html', user=user, reservations=reservations)
+
+@app.route('/update_profile', methods=['POST'])
+@login_required
+def update_profile():
+    user = User.query.get(session['user_id'])
+    user.username = request.form['username']
+    user.email = request.form['email']
+    user.fullname = request.form['full-name']
+    db.session.commit()
+    flash('Profile Successfully Updated!', 'success')
+    return redirect(url_for('user_profile'))
 
 # Admin management routes
 @app.route('/manage_users')
@@ -370,6 +376,18 @@ def manage_users():
     users = User.query.all()
     return render_template('manage_users.html', users=users)
 
+@app.route('/users')
+@admin_required
+def get_users():
+    users = User.query.all()
+    return jsonify([
+        {
+            'id': user.id,
+            'username': user.username,
+            'is_banned': user.is_banned
+        } for user in users
+    ])
+    
 @app.route('/ban_user/<int:user_id>', methods=['POST'])
 @admin_required
 def ban_user(user_id):
@@ -393,7 +411,10 @@ def receipts():
 @app.route('/settings')
 @login_required  # Optional: restrict to logged-in users
 def settings():
-    return render_template('settings.html')
+    user = User.query.get(session['user_id'])
+    reservations= Reservation.query.filter_by(user_id=user.id).all()
+    return render_template('settings.html', user=user, reservations=reservations)
+
 @app.route('/change_password', methods=['GET', 'POST'])
 @login_required
 def change_password():
@@ -405,6 +426,12 @@ def change_password():
         flash('Password changed successfully', 'success')
         return redirect(url_for('settings'))
     return render_template('change_password.html', user=user)
+
+@app.route('/logout', methods=['POST'])
+def logout():
+    session.clear()
+    flash('You have been logged out', 'info')
+    return redirect(url_for('home'))
 
 #delete account route
 @app.route('/delete_account', methods=['POST'])
