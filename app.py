@@ -2,7 +2,7 @@ import os
 from flask import Flask, render_template, request, jsonify, redirect, url_for, flash, session, abort
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
-from models import db, User, ParkingLot, ParkingSpot, Reservation
+from models import Vehicle, db, User, ParkingLot, ParkingSpot, Reservation
 from functools import wraps
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -128,19 +128,41 @@ def user_dashboard():
     return render_template('user_dashboard.html', 
                           user=user, 
                           active_reservations=active_reservations)
-@app.route('/admin_dashboard')
+@app.route('/admin_dashboard', methods=['GET', 'POST'])
 @admin_required
 def admin_dashboard():
     lots=ParkingLot.query.all()
+    spots=ParkingSpot.query.order_by(ParkingSpot.spot_number).all()
     total_users = User.query.count()
     total_lots = ParkingLot.query.count()
-    active_reservations = Reservation.query.filter_by(leaving_timestamp=None).count()
-    
+    selected_spot = None
+    reservation = None
+    vehicle = None
+    if request.method=='POST':
+        spot_id=int(request.form['spot_id'])
+        selected_spot = ParkingSpot.query.get(spot_id)
+        reservation=Reservation.query.filter_by(
+            spot_id=spot_id, 
+            status="Confirmed", 
+            leaving_timestamp=None
+        ).order_by(Reservation.parking_timestamp.desc()).first()
+        if selected_spot:
+            last_reservation = Reservation.query.filter_by(
+                spot_id=selected_spot.id
+            ).order_by(Reservation.parking_timestamp.desc()).first()
+            vehicle = last_reservation.vehicle if last_reservation else None
+            reservation = last_reservation if selected_spot.status == 'O' else None
+
+        if reservation:
+            vehicle = reservation.vehicle
     return render_template('admin_dashboard.html',
-                          total_users=total_users,
-                          total_lots=total_lots,
-                          active_reservations=active_reservations,
-                          lots=lots
+                           spots=spots,
+                           selected_spot=selected_spot,
+                           total_users=total_users,
+                           total_lots=total_lots,
+                           reservation=reservation,
+                           lots=lots,
+                           vehicle=vehicle
                           )
 
 #managing the parking lot
@@ -250,17 +272,33 @@ def booking_process():
         lot_id = request.form['location']
         parking_timestamp = datetime.strptime(request.form['parking_timestamp'], '%Y-%m-%dT%H:%M')
         leaving_timestamp = datetime.strptime(request.form['leaving_timestamp'], '%Y-%m-%dT%H:%M')
-
+        vehicle_brand = request.form['vehicle_brand']
+        vehicle_model = request.form['vehicle_model']
+        vehicle_class = request.form['vehicle_class']
+        vehicle_reg_no = request.form['vehicle_reg_no']
         # Get available spot
         spot = get_available_spot(lot_id)
         # Create reservation
         if spot:
+            vehicle = Vehicle.query.filter_by(registration_number=vehicle_reg_no).first()
+            if not vehicle:
+                vehicle = Vehicle(
+                brand=vehicle_brand,
+                model_name=vehicle_model,
+                vehicle_class=vehicle_class,
+                vehicle_type='4-wheeler', 
+                registration_number=vehicle_reg_no
+                )
+            db.session.add(vehicle)
+            db.session.commit()
+            
             new_reservation = Reservation(
                 spot_id=spot.id,
                 user_id=session['user_id'],
                 parking_timestamp=parking_timestamp,
                 leaving_timestamp=leaving_timestamp,
                 cost_per_hour=spot.lot.price_per_hour,
+                vehicle_id=vehicle.id,
                 status="Confirmed"
             )
             new_reservation.calculate_total_cost()
@@ -391,7 +429,7 @@ def get_users():
 @app.route('/ban_user/<int:user_id>', methods=['POST'])
 @admin_required
 def ban_user(user_id):
-    user = User.query.get(user_id)
+    user = User.query.get_or_404(user_id)
     if user:
         user.is_banned = not user.is_banned
         db.session.commit()
@@ -399,13 +437,39 @@ def ban_user(user_id):
         flash(f'User {action} successfully', 'success')
     return redirect(url_for('manage_users'))
 
+@app.route('/users/<int:user_id>', methods=['PUT'])
+@admin_required
+def update_user(user_id):
+    user = User.query.get_or_404(user_id)
+    data = request.get_json()
+    if 'is_banned' in data:
+        user.is_banned = bool(data['is_banned'])
+        db.session.commit()
+        return {'success': True, 'is_banned': user.is_banned}, 200
+    return {'error': 'Invalid request'}, 400
+
+#receipt generation
 @app.route('/receipts')
 @admin_required
 def receipts():
     reservations = Reservation.query.filter(
-        Reservation.leaving_timestamp.isnot(None)
+        Reservation.leaving_timestamp.isnot(None), Reservation.status!="Cancelled"
     ).order_by(Reservation.leaving_timestamp.desc()).all()
-    return render_template('receipt.html', reservations=reservations)
+
+    receipts = []
+    for r in reservations:
+        receipts.append({
+            'id': r.id,
+            'username': r.user.username,
+            'fullname': r.user.fullname,
+            'parking_spot': r.spot.spot_number,
+            'booking_date': r.parking_timestamp.strftime('%d-%m-%Y'),
+            'start_time': r.parking_timestamp.strftime('%I:%M %p'),
+            'hours_parked': round((r.leaving_timestamp - r.parking_timestamp).total_seconds() / 3600, 2),
+            'rate_per_hour': r.cost_per_hour,
+            'total_amount': r.total_cost,
+        })
+    return render_template('receipt.html', receipts=receipts)
 
 #settings route
 @app.route('/settings')

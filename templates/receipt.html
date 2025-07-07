@@ -71,8 +71,8 @@
             text-align: right;
         }
         .logo-container img {
-            height: 90px;
-            width: 90px;
+            height: 70px;
+            width: 70px;
         }
         @media screen and (max-width: 768px) {
             .sidebar {
@@ -86,6 +86,11 @@
                 right: 5px;
             }
         }
+        @media print {
+            .action-col, .print-btn, .print-btn * {
+                display: none !important;
+            }
+        }
     </style>
 </head>
 <body>
@@ -94,40 +99,72 @@
         <a href="{{ url_for('admin_dashboard') }}">Dashboard</a>
         <a href="{{ url_for('manage_users') }}">Manage Users</a>
         <a href="{{ url_for('manage_lots') }}">Manage Lots</a>
-        <a href="{{ url_for('receipts') }}">Online Parking Receipts</a>
+        <a href="{{ url_for('receipts') }}">System Generated Parking Receipts</a>
     </div>
 
     <div class="main-content">
         <div class="logo-container">
             <img src="{{ url_for('static', filename='../static/images/parker_avenue_logo.png') }}" alt=" ">
         </div>
-        <h1>Online Parking Receipts</h1>
-        <p>Below are the generated receipts for recent parking activity.</p>
+        <h1>System Generated Parking Receipts</h1>
+        <p>Below are the generated receipts for parking and will be handed over physically.</p>
 
         <table id="receiptTable">
             <thead>
                 <tr>
+                    <th>Full Name</th>
                     <th>Username</th>
                     <th>Parking Spot</th>
+                    <th>Booking Date</th>
+                    <th>Start Time</th>
                     <th>Hours Parked</th>
                     <th>Rate/hr (₹)</th>
                     <th>Total Amount (₹)</th>
+                    <th class="action-col">Action</th>
                 </tr>
             </thead>
             <tbody>
                 {% for receipt in receipts %}
-                <tr>
+                <tr id="receipt-row-{{ receipt.id }}">
+                    <td>{{ receipt.fullname }}</td>
                     <td>{{ receipt.username }}</td>
                     <td>{{ receipt.parking_spot }}</td>
+                    <td>{{ receipt.booking_date }}</td>
+                    <td>{{ receipt.start_time }}</td>
                     <td>{{ receipt.hours_parked }}</td>
                     <td>{{ receipt.rate_per_hour }}</td>
                     <td>{{ receipt.total_amount }}</td>
-                </tr>
-                {% endfor %}
+                    <td class="action-col">
+                        <button class="print-btn" onclick="printRow('receipt-row-{{ receipt.id }}')">Print/Download</button>
+        </td>
+    </tr>
+    {% endfor %}
             </tbody>
         </table>
-
-        <button class="print-btn" onclick="window.print()">Print/Download</button>
+        <script>
+            function printRow(rowId) {
+            var row = document.getElementById(rowId).cloneNode(true);
+            var printWindow = window.open('', '', 'width=800,height=600');
+            printWindow.document.write('<html><head><title>Parking Receipt</title>');
+            printWindow.document.write('<style>table{width:100%;border-collapse:collapse;}th,td{padding:12px;border:1px solid #ddd;text-align:left;}body{font-family:Arial,sans-serif;}</style>');
+            printWindow.document.write('</head><body>');
+            printWindow.document.write('<h2>Parking Receipt</h2>');
+            printWindow.document.write('<table>');
+            printWindow.document.write('<tr>');
+            var headers = document.querySelectorAll('#receiptTable th:not(.action-col)');
+            headers.forEach(function(th) {
+                printWindow.document.write('<th>' + th.innerText + '</th>');
+            });
+            printWindow.document.write('</tr>');
+            var actionCell = row.querySelector('.action-col');
+            if (actionCell) actionCell.parentNode.removeChild(actionCell);
+            printWindow.document.write(row.outerHTML);
+            printWindow.document.write('</table>');
+            printWindow.document.write('</body></html>');
+            printWindow.document.close();
+            printWindow.print();
+        }
+        </script>
     </div>
 </body>
 </html>

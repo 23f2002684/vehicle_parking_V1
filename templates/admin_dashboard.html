@@ -93,6 +93,27 @@
             height: 90px;
             width: 90px;
         }
+        .spot-search-section {
+            margin: 32px 0 24px 0;
+            padding: 20px;
+            background: #f6f8fa;
+            border-radius: 8px;
+            max-width: 600px;
+        }
+        .vehicle-info {
+            background: #e3f2fd;
+            border-radius: 8px;
+            padding: 14px 18px;
+            margin-top: 14px;
+        }
+        .status-available {
+            color: #388e3c;
+            font-weight: bold;
+        }
+        .status-occupied {
+            color: #c62828;
+            font-weight: bold;
+        }
         @media screen and (max-width: 768px) {
             .sidebar {
                 width: 200px;
@@ -124,13 +145,49 @@
         <p>Here you can view stats and manage parking lots.</p>
         <a href="{{ url_for('create_lot') }}" class="btn">+ Create New Lot</a>
         <div class="setting-section">
-                    <h3>Logout</h3>
-                    <p>Once logged out, you will need to login again to access the admin dashboard.</p>
-                    <form action="{{ url_for('logout') }}" method="POST" style="display:inline;">
-                        <button class="logout-button" type="submit">Logout</button>
-                    </form>
+            <h3>Logout</h3>
+            <p>Once logged out, you will need to login again to access the admin dashboard.</p>
+            <form action="{{ url_for('logout') }}" method="POST" style="display:inline;">
+                <button class="logout-button" type="submit">Logout</button>
+            </form>
         </div>
 
+        <div class="spot-search-section">
+            <h4>Search Parking Spot Status & Vehicle Details</h4>
+            <form method="POST">
+                <label for="spot_id">Select Parking Spot:</label>
+                <select name="spot_id" id="spot_id" required>
+                    <option value="" disabled selected>Select a spot</option>
+                    {% for spot in spots %}
+                        <option value="{{ spot.id }}"
+                            {% if selected_spot and spot.id == selected_spot.id %}selected{% endif %}>
+                            {{ spot.spot_number }} (Lot: {{ spot.lot.prime_location_name }})
+                        </option>
+                    {% endfor %}
+                </select>
+                <button type="submit" class="btn btn-sm btn-primary">View Status</button>
+            </form>
+
+            {% if selected_spot %}
+                <div class="mt-3">
+                    <b>Spot:</b> {{ selected_spot.spot_number }} ({{ selected_spot.lot.prime_location_name }})<br>
+                    <b>Status:</b>
+                    {% if selected_spot.status == 'A' %}
+                        <span class="status-available">Available</span>
+                    {% else %}
+                        <span class="status-occupied">Occupied</span>
+                    {% endif %}
+                    <div class="vehicle-info mt-2">
+                        <b>Vehicle Details (4-wheeler only):</b><br>
+                        Brand: {{ vehicle.brand if vehicle else 'N/A' }}<br>
+                        Model: {{ vehicle.model_name if vehicle else 'N/A' }}<br>
+                        Class: {{ vehicle.vehicle_class if vehicle else 'N/A' }}<br>
+                        Registration: {{ vehicle.registration_number if vehicle else 'N/A' }}<br>
+                    </div>
+                    {% elif selected_spot.status == 'O' %}
+                        <div class="alert alert-warning mt-2">No valid 4-wheeler vehicle info found for this spot.</div>
+                    {% endif %}
+                </div>
         <h2 style="margin-top: 32px;">Parking Lots</h2>
         <table>
             <thead>

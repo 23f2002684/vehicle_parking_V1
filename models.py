@@ -54,6 +54,9 @@ class Reservation(db.Model):
     # Foreign key to User
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     
+    # Foreign key to Vehicle
+    vehicle_id = db.Column(db.Integer, db.ForeignKey('vehicle.id'), nullable=True)
+    
     parking_timestamp = db.Column(db.DateTime, default=datetime.utcnow)
     leaving_timestamp = db.Column(db.DateTime, nullable=True)
 
@@ -63,9 +66,18 @@ class Reservation(db.Model):
 
     # Method to compute total bill after leaving
     def calculate_total_cost(self):
-        if self.leaving_timestamp:
-            duration = (self.leaving_timestamp - self.parking_timestamp).total_seconds() / 3600
-            self.total_cost = round(duration * self.cost_per_hour, 2)
+        if self.leaving_timestamp and self.parking_timestamp:
+            duration_hours = (self.leaving_timestamp - self.parking_timestamp).total_seconds() / 3600
+            self.total_cost = round(duration_hours * self.cost_per_hour, 2)
             return self.total_cost
         return 0.0
+    
+class Vehicle(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    brand = db.Column(db.String(50), nullable=False)
+    model_name = db.Column(db.String(50), nullable=False)
+    vehicle_class = db.Column(db.String(20), nullable=False)
+    vehicle_type = db.Column(db.String(20), nullable=False)
+    registration_number = db.Column(db.String(20), nullable=False)
+    reservations = db.relationship('Reservation', backref='vehicle', lazy=True)
 #A decent amount of normlization has been done

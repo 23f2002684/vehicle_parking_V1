@@ -125,9 +125,7 @@
             border: none;
             cursor: pointer;
         }
-        .delete-btn { background: #d32f2f; color: #fff; }
         .ban-btn { background: #ff9800; color: #fff; }
-        .assign-btn { background: #1976d2; color: #fff; }
         @media screen and (max-width: 768px) {
             .sidebar {
                 width: 200px;
@@ -168,121 +166,32 @@
                 </tr>
             </thead>
             <tbody>
+                {% for user in users %}
+                <tr>
+                    <td>{{ user.id }}</td>
+                    <td>{{ user.username }}</td>
+                    <td>{{ 'Banned' if user.is_banned else 'Active' }}</td>
+                    <td>
+                        <form action="{{ url_for('ban_user', user_id=user.id) }}" method="post" style="display:inline;">
+                            <button class="ban-btn" type="submit">{{ 'Unban' if user.is_banned else 'Ban' }}</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
             </tbody>
         </table>
     </div>
 
-    <!-- Ban User Modal -->
     <div class="modal" id="banModal">
         <div class="modal-content">
             <h3>Ban a User</h3>
             <select id="banUserSelect">
-                <option value="">Select a user</option>
+                <option value=" ">Select a user</option>
             </select>
             <br>
             <button class="ban-confirm" onclick="banSelectedUser()">Ban</button>
             <button class="ban-cancel" onclick="closeBanModal()">Cancel</button>
         </div>
     </div>
-
-    <script>
-        let allUsers = [];
-
-        async function fetchUsers() {
-            const res = await fetch('/users');
-            const users = await res.json();
-            allUsers = users;
-            const tbody = document.querySelector('#userTable tbody');
-            tbody.innerHTML = '';
-
-            users.forEach(user => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${user.id}</td>
-                    <td>${user.username}</td>
-                    <td>${user.is_banned ? 'Banned' : 'Active'}</td>
-                    <td>
-                        <button class="delete-btn" onclick="deleteUser(${user.id})">Delete</button>
-                        <button class="ban-btn" onclick="toggleBan(${user.id}, ${user.is_banned})">${user.is_banned ? 'Unban' : 'Ban'}</button>
-                        <button class="assign-btn" onclick="assignSpot(${user.id})">Assign Spot</button>
-                    </td>
-                `;
-                tbody.appendChild(row);
-            });
-
-            populateBanUserDropdown(users);
-        }
-
-        function populateBanUserDropdown(users) {
-            const select = document.getElementById('banUserSelect');
-            select.innerHTML = '<option value="">Select a user</option>';
-            users.forEach(user => {
-                if (!user.is_banned) {
-                    const option = document.createElement('option');
-                    option.value = user.id;
-                    option.textContent = `${user.username} (ID: ${user.id})`;
-                    select.appendChild(option);
-                }
-            });
-        }
-
-        async function deleteUser(id) {
-            if (confirm('Are you sure you want to delete this user?')) {
-                await fetch(`/users/${id}`, { method: 'DELETE' });
-                alert('User deleted.');
-                fetchUsers();
-            }
-        }
-
-        async function toggleBan(id, isBanned) {
-            const payload = { is_banned: !isBanned };
-            await fetch(`/users/${id}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-            alert(`User ${!isBanned ? 'banned' : 'unbanned'}.`);
-            fetchUsers();
-        }
-
-        function assignSpot(userId) {
-            const spot = prompt("Enter the new parking spot ID to assign:");
-            if (spot) {
-                fetch('/assign_spot', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ user_id: userId, spot_id: spot })
-                }).then(res => {
-                    if (res.ok) {
-                        alert("Spot assigned!");
-                    } else {
-                        alert("Assignment failed.");
-                    }
-                });
-            }
-        }
-
-        function openBanModal() {
-            document.getElementById('banModal').style.display = 'flex';
-        }
-        function closeBanModal() {
-            document.getElementById('banModal').style.display = 'none';
-        }
-        async function banSelectedUser() {
-            const select = document.getElementById('banUserSelect');
-            const userId = select.value;
-            if (!userId) {
-                alert('Please select a user to ban.');
-                return;
-            }
-            await fetch(`/ban_user/${userId}`, { method: 'POST' });
-            alert('User banned successfully.');
-            closeBanModal();
-            fetchUsers();
-        }
-
-        // Initial load
-        fetchUsers();
-    </script>
 </body>
 </html>

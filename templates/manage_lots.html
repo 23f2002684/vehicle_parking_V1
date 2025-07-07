@@ -121,36 +121,26 @@
                 </tr>
             </thead>
             <tbody>
+                {% for lot in lots %}
+                <tr>
+                    <td>{{ lot.id }}</td>
+                    <td>{{ lot.prime_location_name }}</td>
+                    <td>₹{{ lot.price_per_hour }}</td>
+                    <td>{{ lot.address }}</td>
+                    <td>{{ lot.pin_code }}</td>
+                    <td>{{ lot.max_spots }}</td>
+                    <td>
+                        <a href="{{ url_for('edit_lot', lot_id=lot.id) }}" class="btn">Edit</a>
+                        <a href="{{ url_for('delete_lot', lot_id=lot.id) }}" class="btn" style="background:#d32f2f;">Delete</a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="7">No parking lots found.</td>
+                </tr>
+                {% endfor %}
             </tbody>
         </table>
     </div>
-
-    <script>
-    fetch('/lots')
-        .then(response => response.json())
-        .then(lots => {
-            const tbody = document.querySelector('#lots-table tbody');
-            tbody.innerHTML = '';
-            lots.forEach(lot => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${lot.id}</td>
-                    <td>${lot.name}</td>
-                    <td>₹${lot.price}</td>
-                    <td>${lot.address}</td>
-                    <td>${lot.pincode}</td>
-                    <td>${lot.max_spots}</td>
-                    <td>
-                        <a href="/edit_lot/${lot.id}" class="btn">Edit</a>
-                        <a href="/delete_lot/${lot.id}" class="btn" style="background:#d32f2f;">Delete</a>
-                    </td>
-                `;
-                tbody.appendChild(row);
-            });
-        })
-        .catch(err => {
-            document.querySelector('#lots-table tbody').innerHTML = '<tr><td colspan="7">Failed to load lots.</td></tr>';
-        });
-    </script>
 </body>
 </html>
