@@ -75,9 +75,26 @@
             right: 5px;
             text-align: right;
         }
+        td .action-buttons {
+            display: flex;
+            gap: 8px; 
+            flex-wrap: wrap;
+    }
+
+    td .action-buttons .btn {
+        min-width: 70px;
+        margin-right: 0;
+        margin-bottom: 0;
+        white-space: nowrap;
+    }
         .logo-container img {
             height: 90px;
             width: 90px;
+        }
+        .chart-section {
+            margin-left: 100px;
+            padding: 20px 20px 40px 20px;
+            width: calc(100% - 250px);
         }
         @media screen and (max-width: 768px) {
             .sidebar {
@@ -89,6 +106,11 @@
             .logo-container {
                 top: 5px;
                 right: 5px;
+            }
+            td .action-buttons {
+            flex-direction: column;
+            gap: 6px;
+            align-items: flex-start;
             }
         }
     </style>
@@ -130,8 +152,10 @@
                     <td>{{ lot.pin_code }}</td>
                     <td>{{ lot.max_spots }}</td>
                     <td>
+                        <div class="action-buttons">
                         <a href="{{ url_for('edit_lot', lot_id=lot.id) }}" class="btn">Edit</a>
                         <a href="{{ url_for('delete_lot', lot_id=lot.id) }}" class="btn" style="background:#d32f2f;">Delete</a>
+                        </div>
                     </td>
                 </tr>
                 {% else %}
@@ -142,5 +166,50 @@
             </tbody>
         </table>
     </div>
+    <br>
+    <div class="chart-section">
+        <h3>Parking Lot Spot Summary</h3>
+        <canvas id="lotSpotsChart" width="600" height="800"></canvas>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    </div>
+    <script>
+    const adminLotNames = {{ admin_lot_names|tojson }};
+    const adminMaxSpots = {{ admin_max_spots|tojson }};
+    const adminOccupied = {{ admin_occupied|tojson }};
+    const adminAvailable = {{ admin_available|tojson }};
+
+    new Chart(document.getElementById('lotSpotsChart').getContext('2d'), {
+        type: 'bar',
+        data: {
+            labels: adminLotNames,
+            datasets: [
+                {
+                    label: 'Total Spots',
+                    data: adminMaxSpots,
+                    backgroundColor: 'rgba(54, 162, 235, 0.7)'
+                },
+                {
+                    label: 'Occupied Spots',
+                    data: adminOccupied,
+                    backgroundColor: 'rgba(255, 99, 132, 0.7)'
+                },
+                {
+                    label: 'Available Spots',
+                    data: adminAvailable,
+                    backgroundColor: 'rgba(75, 192, 192, 0.7)'
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: 'top' }
+            },
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+    </script>
 </body>
 </html>

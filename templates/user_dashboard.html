@@ -66,6 +66,11 @@
             height: auto;
             width: 80px;
         }
+        .chart-section {
+            margin-left: 100px;
+            padding: 20px 20px 40px 20px;
+            width: calc(100% - 250px);
+        }
         @media screen and (max-width: 768px) {
             .sidebar {
                 width: 200px;
@@ -107,5 +112,37 @@
             <p>Update your personal information, change your password, and manage your account settings.</p>
         </div>
     </div>
+    <div class="chart-section">
+        <h3>Your Bookings by Parking Lot</h3>
+        <canvas id="userBookingsPie" width="50" height="200"></canvas>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    </div>
+    <script>
+    const userLotNames = {{ user_lot_names|tojson }};
+    const userBookingsCounts = {{ user_bookings_counts|tojson }};
+
+    new Chart(document.getElementById('userBookingsPie').getContext('2d'), {
+        type: 'pie',
+        data: {
+            labels: userLotNames,
+            datasets: [{
+                data: userBookingsCounts,
+                backgroundColor: [
+                    'rgba(54, 162, 235, 0.7)',
+                    'rgba(255, 99, 132, 0.7)',
+                    'rgba(255, 206, 86, 0.7)',
+                    'rgba(75, 192, 192, 0.7)',
+                    'rgba(153, 102, 255, 0.7)'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: 'right' }
+            }
+        }
+    });
+    </script>
 </body>
 </html>
