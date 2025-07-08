@@ -543,29 +543,26 @@ def settings():
     reservations= Reservation.query.filter_by(user_id=user.id).all()
     return render_template('settings.html', user=user, reservations=reservations)
 
-@app.route('/change_password', methods=['GET', 'POST'])
+@app.route('/change_password', methods=['POST'])
 @login_required
 def change_password():
-    if request.method == 'POST':
-        current_password = request.form['current_password']
-        new_password = request.form['new_password']
-        confirm_password = request.form['confirm_password']
+    current_password = request.form['current_password']
+    new_password = request.form['new_password']
+    confirm_password = request.form['confirm_password']
 
-        user = User.query.get(session['user_id'])
-        if not check_password_hash(user.password, current_password):
-            flash('Current password is incorrect.', 'danger')
-            return redirect(url_for('change_password'))
-
-        if new_password != confirm_password:
-            flash('New passwords do not match.', 'danger')
-            return redirect(url_for('change_password'))
-
-        user.password = generate_password_hash(new_password)
-        db.session.commit()
-        flash('Password updated successfully!', 'success')
+    user = User.query.get(session['user_id'])
+    if not check_password_hash(user.password, current_password):
+        flash('Current password is incorrect.', 'danger')
         return redirect(url_for('settings'))
-    return render_template('change_password.html')
 
+    if new_password != confirm_password:
+        flash('Passwords do not match. Check again.', 'danger')
+        return redirect(url_for('settings'))
+
+    user.password = generate_password_hash(new_password)
+    db.session.commit()
+    flash('Password updated successfully!', 'success')
+    return redirect(url_for('settings'))
 
 @app.route('/logout', methods=['POST'])
 def logout():
