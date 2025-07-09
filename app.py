@@ -21,6 +21,7 @@ db.init_app(app)
 # Creating the database tables
 with app.app_context():
     db.create_all()
+    
 def get_lot_by_id(lot_id):
     return ParkingLot.query.get_or_404(lot_id)
 
@@ -120,9 +121,7 @@ def admin_login():
 @login_required
 def user_dashboard():
     user = User.query.get(session['user_id'])
-    # Get all reservations (not just active) for meaningful charts
     reservations = Reservation.query.filter_by(user_id=user.id).order_by(Reservation.parking_timestamp.desc()).all()
-
     # Bookings per lot (for pie/bar chart)
     lot_counts = {}
     for r in reservations:
@@ -130,7 +129,6 @@ def user_dashboard():
         lot_counts[lot_name] = lot_counts.get(lot_name, 0) + 1
     user_lot_names = list(lot_counts.keys())
     user_bookings_counts = list(lot_counts.values())
-
     # Parking cost over time (for line chart, by month)
     cost_by_month = {}
     for r in reservations:
@@ -139,10 +137,7 @@ def user_dashboard():
             cost_by_month[month] = cost_by_month.get(month, 0) + (r.total_cost or 0)
     user_months = sorted(cost_by_month.keys())
     user_costs = [cost_by_month[month] for month in user_months]
-
-    # For dashboard display, you may still want to show active reservations
     active_reservations = [r for r in reservations if r.leaving_timestamp is None][:3]
-
     return render_template(
         'user_dashboard.html',
         user_lot_names=user_lot_names,
@@ -245,13 +240,11 @@ def manage_lots():
         admin_available=admin_available
     )
 
-
 @app.route('/edit_lot/<int:lot_id>', methods=['GET', 'POST'])
 @admin_required
 def edit_lot(lot_id):
     lot = ParkingLot.query.get_or_404(lot_id)
     occupied_spots = count_occupied_spots(lot_id)
-    
     if request.method == 'POST':
         lot.prime_location_name = request.form['prime_location_name']
         lot.price_per_hour = float(request.form['price_per_hour'])
@@ -275,14 +268,12 @@ def edit_lot(lot_id):
                 lot_id=lot.id, 
                 status='A'
             ).limit(lot.max_spots - new_max).all()
-            
             for spot in spots_to_remove:
                 db.session.delete(spot)
         lot.max_spots = new_max
         db.session.commit()
         flash('Lot updated successfully', 'success')
         return redirect(url_for('manage_lots'))
-    
     return render_template('edit_lot.html', lot=lot, occupied_spots=occupied_spots)
 
 @app.route('/delete_lot/<int:lot_id>', methods=['GET', 'POST'])
@@ -290,7 +281,6 @@ def edit_lot(lot_id):
 def delete_lot(lot_id):
     lot = get_lot_by_id(lot_id)
     occupied_spots = count_occupied_spots(lot_id)
-    
     if request.method == 'POST':
         if occupied_spots == 0:
             spot_ids = [spot.id for spot in ParkingSpot.query.filter_by(lot_id=lot.id).all()]
@@ -302,7 +292,6 @@ def delete_lot(lot_id):
             flash('Lot deleted successfully', 'success')
             return redirect(url_for('manage_lots'))
         flash('Cannot delete lot with occupied spots', 'danger')
-    
     return render_template('delete_lot.html', lot=lot, occupied_spots=occupied_spots)
 
 # Booking system
@@ -331,7 +320,6 @@ def user_bookings():
 @login_required
 def booking_process():
     if request.method == 'POST':
-        # Get form data
         lot_id = request.form['location']
         parking_timestamp = datetime.strptime(request.form['parking_timestamp'], '%Y-%m-%dT%H:%M')
         leaving_timestamp = datetime.strptime(request.form['leaving_timestamp'], '%Y-%m-%dT%H:%M')
@@ -339,7 +327,6 @@ def booking_process():
         vehicle_model = request.form['vehicle_model']
         vehicle_class = request.form['vehicle_class']
         vehicle_reg_no = request.form['vehicle_reg_no']
-        # Get available spot
         spot = get_available_spot(lot_id)
         # Create reservation
         if spot:
@@ -353,8 +340,7 @@ def booking_process():
                 registration_number=vehicle_reg_no
                 )
             db.session.add(vehicle)
-            db.session.commit()
-            
+            db.session.commit() 
             new_reservation = Reservation(
                 spot_id=spot.id,
                 user_id=session['user_id'],
@@ -379,10 +365,8 @@ def booking_process():
 @login_required
 def book_status(booking_id):
     reservation = Reservation.query.get_or_404(booking_id)
-    
     if reservation.user_id != session['user_id']:
-        abort(403)
-        
+        abort(403)    
     return render_template('book_status.html', 
                            reservation=reservation,
                            lot=reservation.spot.lot,
@@ -396,7 +380,6 @@ def cancel_booking(booking_id):
         abort(403)
     if booking.status not in ["Completed", "Cancelled", "Rejected"]:
         booking.status = "Cancelled"
-        # Optionally free up the spot if needed:
         if booking.spot.status == 'O':
             booking.spot.status = 'A'
         db.session.commit()
@@ -407,17 +390,12 @@ def cancel_booking(booking_id):
 @login_required
 def end_reservation(reservation_id):
     reservation = Reservation.query.get_or_404(reservation_id)
-    
-    # Security check
     if reservation.user_id != session['user_id']:
         abort(403)
-    
     reservation.leaving_timestamp = datetime.utcnow()
     reservation.calculate_total_cost()
     reservation.spot.status = 'A'
-    
     db.session.commit()
-    
     flash(f'Reservation ended. Total cost: ₹{reservation.total_cost}', 'success')
     return redirect(url_for('user_bookings'))
 
@@ -519,7 +497,6 @@ def receipts():
     reservations = Reservation.query.filter(
         Reservation.leaving_timestamp.isnot(None), Reservation.status!="Cancelled"
     ).order_by(Reservation.leaving_timestamp.desc()).all()
-
     receipts = []
     for r in reservations:
         receipts.append({
@@ -537,7 +514,7 @@ def receipts():
 
 #settings route
 @app.route('/settings')
-@login_required  # Optional: restrict to logged-in users
+@login_required  
 def settings():
     user = User.query.get(session['user_id'])
     reservations= Reservation.query.filter_by(user_id=user.id).all()
@@ -549,16 +526,13 @@ def change_password():
     current_password = request.form['current_password']
     new_password = request.form['new_password']
     confirm_password = request.form['confirm_password']
-
     user = User.query.get(session['user_id'])
     if not check_password_hash(user.password, current_password):
         flash('Current password is incorrect.', 'danger')
         return redirect(url_for('settings'))
-
     if new_password != confirm_password:
         flash('Passwords do not match. Check again.', 'danger')
         return redirect(url_for('settings'))
-
     user.password = generate_password_hash(new_password)
     db.session.commit()
     flash('Password updated successfully!', 'success')
