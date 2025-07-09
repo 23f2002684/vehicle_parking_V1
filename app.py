@@ -45,7 +45,7 @@ def admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if not session.get('admin_logged_in'):
-            flash('Admin access required', 'danger')
+            flash('Admin access is required', 'danger')
             return redirect(url_for('admin_login'))
         return f(*args, **kwargs)
     return decorated_function
@@ -96,7 +96,7 @@ def user_login():
         user = User.query.filter_by(username=username).first()
         if user and check_password_hash(user.password, password):
             if user.is_banned:
-                flash('Your account has been suspended', 'danger')
+                flash('Your account has been suspended! Please contact office for more information.', 'danger')
                 return redirect(url_for('user_login'))
             session['user_id'] = user.id
             return redirect(url_for('user_dashboard'))
@@ -112,7 +112,7 @@ def admin_login():
         if username == 'admin' and password == 'unique1234':
             session['admin_logged_in'] = True
             return redirect(url_for('admin_dashboard'))
-        flash('Invalid admin credentials', 'danger')
+        flash('Invalid admin credentials...', 'danger')
     return render_template('admin_login.html')
 
 #dashboard routes
@@ -225,7 +225,7 @@ def edit_lot(lot_id):
         lot.pin_code = request.form['pin_code']
         new_max = int(request.form['max_spots'])
         if new_max < occupied_spots:
-            flash(f'Cannot reduce spots below {occupied_spots} occupied spots', 'danger')
+            flash(f'Can\'t reduce spots below {occupied_spots} occupied spots', 'danger')
             return redirect(url_for('edit_lot', lot_id=lot_id))
         if new_max > lot.max_spots:
             for i in range(lot.max_spots + 1, new_max + 1):
@@ -245,7 +245,7 @@ def edit_lot(lot_id):
                 db.session.delete(spot)
         lot.max_spots = new_max
         db.session.commit()
-        flash('Lot updated successfully', 'success')
+        flash('Lot Update Success!', 'success')
         return redirect(url_for('manage_lots'))
     return render_template('edit_lot.html', lot=lot, occupied_spots=occupied_spots)
 
@@ -262,9 +262,9 @@ def delete_lot(lot_id):
                 ParkingSpot.query.filter_by(lot_id=lot.id).delete()
             db.session.delete(lot)
             db.session.commit()
-            flash('Lot deleted successfully', 'success')
+            flash('Lot deleted successfully!', 'success')
             return redirect(url_for('manage_lots'))
-        flash('Cannot delete lot with occupied spots', 'danger')
+        flash('Can\'t delete lot with occupied spots', 'danger')
     return render_template('delete_lot.html', lot=lot, occupied_spots=occupied_spots)
 
 # Booking system
@@ -315,7 +315,7 @@ def booking_process():
             flash('Booking successful!', 'success')
             return redirect(url_for('book_status', booking_id=new_reservation.id))
         else:
-            flash('No available spots at this location', 'danger')
+            flash('No available spots at this location. How about another location?', 'danger')
             return redirect(url_for('booking_process'))
     return render_template('booking_process.html')
 
@@ -338,7 +338,7 @@ def cancel_booking(booking_id):
         if booking.spot.status == 'O':
             booking.spot.status = 'A'
         db.session.commit()
-        flash('Booking cancelled.', 'warning')
+        flash('Booking is cancelled!', 'warning')
     return redirect(url_for('user_bookings'))
 
 @app.route('/end_reservation/<int:reservation_id>', methods=['POST'])
@@ -380,7 +380,6 @@ def user_profile():
         user.email = request.form['email']
         user.fullname = request.form['full-name']
         db.session.commit()
-        flash('Profile updated successfully', 'success')
         return redirect(url_for('user_profile'))
     return render_template('user_profile.html', user=user, reservations=reservations)
 
@@ -392,7 +391,7 @@ def update_profile():
     user.email = request.form['email']
     user.fullname = request.form['full-name']
     db.session.commit()
-    flash('Profile Successfully Updated!', 'success')
+    flash('Profile Update Success!', 'success')
     return redirect(url_for('user_profile'))
 
 # Admin work routes
@@ -453,20 +452,20 @@ def change_password():
     confirm_password = request.form['confirm_password']
     user = User.query.get(session['user_id'])
     if not check_password_hash(user.password, current_password):
-        flash('Current password is incorrect.', 'danger')
+        flash('Current password is incorrect!', 'danger')
         return redirect(url_for('settings'))
     if new_password != confirm_password:
-        flash('Passwords do not match. Check again.', 'danger')
+        flash('Passwords don\'t match! Check again.', 'danger')
         return redirect(url_for('settings'))
     user.password = generate_password_hash(new_password)
     db.session.commit()
-    flash('Password updated successfully!', 'success')
+    flash('Password has been updated successfully!', 'success')
     return redirect(url_for('settings'))
 
 @app.route('/logout', methods=['POST'])
 def logout():
     session.clear()
-    flash('You have been logged out', 'info')
+    flash('Oops! You have been logged out', 'info')
     return redirect(url_for('home'))
 
 #delete account route
@@ -479,7 +478,7 @@ def delete_account():
         db.session.delete(user)
         db.session.commit()
         session.clear()
-        flash("Account deleted successfully.", "info")
+        flash("Account has been deleted successfully!", "info")
         return redirect(url_for('home'))
     flash("Something went wrong.", "danger")
     return redirect(url_for('settings'))
