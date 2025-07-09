@@ -94,7 +94,6 @@ def user_login():
         username = request.form['username']
         password = request.form['password']
         user = User.query.filter_by(username=username).first()
-
         if user and check_password_hash(user.password, password):
             if user.is_banned:
                 flash('Your account has been suspended', 'danger')
@@ -123,30 +122,22 @@ def user_dashboard():
     user = User.query.get(session['user_id'])
     reservations = Reservation.query.filter_by(user_id=user.id).order_by(Reservation.parking_timestamp.desc()).all()
     # Bookings per lot (for pie/bar chart)
-    lot_counts = {}
-    for r in reservations:
-        lot_name = r.spot.lot.prime_location_name
-        lot_counts[lot_name] = lot_counts.get(lot_name, 0) + 1
-    user_lot_names = list(lot_counts.keys())
-    user_bookings_counts = list(lot_counts.values())
+    lots_count = {}
+    for i in reservations:
+        lot_name = i.spot.lot.prime_location_name
+        lots_count[lot_name] = lots_count.get(lot_name, 0) + 1
+    user_lot_names = list(lots_count.keys())
+    user_bookings_counts = list(lots_count.values())
     # Parking cost over time (for line chart, by month)
-    cost_by_month = {}
-    for r in reservations:
-        if r.leaving_timestamp:
-            month = r.leaving_timestamp.strftime('%b-%Y')
-            cost_by_month[month] = cost_by_month.get(month, 0) + (r.total_cost or 0)
-    user_months = sorted(cost_by_month.keys())
-    user_costs = [cost_by_month[month] for month in user_months]
-    active_reservations = [r for r in reservations if r.leaving_timestamp is None][:3]
-    return render_template(
-        'user_dashboard.html',
-        user_lot_names=user_lot_names,
-        user_bookings_counts=user_bookings_counts,
-        user_months=user_months,
-        user_costs=user_costs,
-        user=user,
-        active_reservations=active_reservations
-    )
+    monthly_cost = {}
+    for i in reservations:
+        if i.leaving_timestamp:
+            month = i.leaving_timestamp.strftime('%b-%Y')
+            monthly_cost[month] = monthly_cost.get(month, 0) + (i.total_cost or 0)
+    user_months = sorted(monthly_cost.keys())
+    user_costs = [monthly_cost[month] for month in user_months]
+    active_reservations = [i for i in reservations if i.leaving_timestamp is None][:3]
+    return render_template('user_dashboard.html',user_lot_names=user_lot_names,user_bookings_counts=user_bookings_counts,user_months=user_months,user_costs=user_costs,user=user,active_reservations=active_reservations)
 
 @app.route('/admin_dashboard', methods=['GET', 'POST'])
 @admin_required
@@ -172,18 +163,9 @@ def admin_dashboard():
             ).order_by(Reservation.parking_timestamp.desc()).first()
             vehicle = last_reservation.vehicle if last_reservation else None
             reservation = last_reservation if selected_spot.status == 'O' else None
-
         if reservation:
             vehicle = reservation.vehicle
-    return render_template('admin_dashboard.html',
-                           spots=spots,
-                           selected_spot=selected_spot,
-                           total_users=total_users,
-                           total_lots=total_lots,
-                           reservation=reservation,
-                           lots=lots,
-                           vehicle=vehicle
-                          )
+    return render_template('admin_dashboard.html',spots=spots,selected_spot=selected_spot,total_users=total_users,total_lots=total_lots,reservation=reservation,lots=lots,vehicle=vehicle)
 
 #managing the parking lot
 @app.route('/create_lot', methods=['GET', 'POST'])
@@ -220,7 +202,6 @@ def manage_lots():
     admin_max_spots = []
     admin_occupied = []
     admin_available = []
-
     for lot in lots:
         spots = lot.spots
         total = lot.max_spots
@@ -230,15 +211,7 @@ def manage_lots():
         admin_max_spots.append(total)
         admin_occupied.append(occupied)
         admin_available.append(available)
-
-    return render_template(
-        'manage_lots.html',
-        lots=lots,
-        admin_lot_names=admin_lot_names,
-        admin_max_spots=admin_max_spots,
-        admin_occupied=admin_occupied,
-        admin_available=admin_available
-    )
+    return render_template('manage_lots.html', lots=lots,admin_lot_names=admin_lot_names,admin_max_spots=admin_max_spots,admin_occupied=admin_occupied,admin_available=admin_available)
 
 @app.route('/edit_lot/<int:lot_id>', methods=['GET', 'POST'])
 @admin_required
@@ -313,8 +286,7 @@ def user_bookings():
             cost_by_month[month] = cost_by_month.get(month, 0) + (r.total_cost or 0)
     user_months = sorted(cost_by_month.keys())
     user_costs = [cost_by_month[month] for month in user_months]
-    return render_template('user_bookings.html', reservations=reservations, now=datetime.utcnow(), 
-                           user=user, lot_counts=lot_counts, user_lot_names=user_lot_names,user_bookings_counts=user_bookings_counts, user_months=user_months, user_costs=user_costs)
+    return render_template('user_bookings.html', reservations=reservations, now=datetime.utcnow(), user=user, lot_counts=lot_counts, user_lot_names=user_lot_names,user_bookings_counts=user_bookings_counts, user_months=user_months, user_costs=user_costs)
 
 @app.route('/booking_process', methods=['GET', 'POST'])
 @login_required
@@ -332,26 +304,12 @@ def booking_process():
         if spot:
             vehicle = Vehicle.query.filter_by(registration_number=vehicle_reg_no).first()
             if not vehicle:
-                vehicle = Vehicle(
-                brand=vehicle_brand,
-                model_name=vehicle_model,
-                vehicle_class=vehicle_class,
-                vehicle_type='4-wheeler', 
-                registration_number=vehicle_reg_no
-                )
+                vehicle = Vehicle(brand=vehicle_brand,model_name=vehicle_model,vehicle_class=vehicle_class,vehicle_type='4-wheeler', registration_number=vehicle_reg_no)
             db.session.add(vehicle)
             db.session.commit() 
-            new_reservation = Reservation(
-                spot_id=spot.id,
-                user_id=session['user_id'],
-                parking_timestamp=parking_timestamp,
-                leaving_timestamp=leaving_timestamp,
-                cost_per_hour=spot.lot.price_per_hour,
-                vehicle_id=vehicle.id,
-                status="Confirmed"
-            )
+            new_reservation = Reservation(spot_id=spot.id,user_id=session['user_id'],parking_timestamp=parking_timestamp,leaving_timestamp=leaving_timestamp,cost_per_hour=spot.lot.price_per_hour,vehicle_id=vehicle.id,status="Confirmed")
             new_reservation.calculate_total_cost()
-            spot.status = 'O'  # Mark spot as occupied
+            spot.status = 'O'  
             db.session.add(new_reservation)
             db.session.commit()
             flash('Booking successful!', 'success')
@@ -367,10 +325,7 @@ def book_status(booking_id):
     reservation = Reservation.query.get_or_404(booking_id)
     if reservation.user_id != session['user_id']:
         abort(403)    
-    return render_template('book_status.html', 
-                           reservation=reservation,
-                           lot=reservation.spot.lot,
-                           now=datetime.utcnow())
+    return render_template('book_status.html', reservation=reservation,lot=reservation.spot.lot, now=datetime.utcnow())
     
 @app.route('/cancel_booking/<int:booking_id>', methods=['POST'])
 @login_required
@@ -403,15 +358,7 @@ def end_reservation(reservation_id):
 @app.route('/lots', methods=['GET'])
 def get_lots():
     lots = ParkingLot.query.all()
-    return jsonify([{
-        'id': lot.id,
-        'name': lot.prime_location_name,
-        'price': lot.price_per_hour,
-        'address': lot.address,
-        'pincode': lot.pin_code,
-        'max_spots': lot.max_spots,
-        'available_spots': ParkingSpot.query.filter_by(lot_id=lot.id, status='A').count()
-    } for lot in lots])
+    return jsonify([{'id': lot.id,'name': lot.prime_location_name,'price': lot.price_per_hour,'address': lot.address,'pincode': lot.pin_code,'max_spots': lot.max_spots,'available_spots': ParkingSpot.query.filter_by(lot_id=lot.id, status='A').count()} for lot in lots])
 
 @app.route('/lot_details/<int:lot_id>')
 @login_required
@@ -448,7 +395,7 @@ def update_profile():
     flash('Profile Successfully Updated!', 'success')
     return redirect(url_for('user_profile'))
 
-# Admin management routes
+# Admin work routes
 @app.route('/manage_users')
 @admin_required
 def manage_users():
@@ -486,18 +433,8 @@ def receipts():
         Reservation.leaving_timestamp.isnot(None), Reservation.status!="Cancelled"
     ).order_by(Reservation.leaving_timestamp.desc()).all()
     receipts = []
-    for r in reservations:
-        receipts.append({
-            'id': r.id,
-            'username': r.user.username,
-            'fullname': r.user.fullname,
-            'parking_spot': r.spot.spot_number,
-            'booking_date': r.parking_timestamp.strftime('%d-%m-%Y'),
-            'start_time': r.parking_timestamp.strftime('%I:%M %p'),
-            'hours_parked': round((r.leaving_timestamp - r.parking_timestamp).total_seconds() / 3600, 2),
-            'rate_per_hour': r.cost_per_hour,
-            'total_amount': r.total_cost,
-        })
+    for i in reservations:
+        receipts.append({'id': i.id,'username': i.user.username,'fullname': i.user.fullname,'parking_spot': i.spot.spot_number,'booking_date': i.parking_timestamp.strftime('%d-%m-%Y'),'start_time': i.parking_timestamp.strftime('%I:%M %p'),'hours_parked': round((i.leaving_timestamp - i.parking_timestamp).total_seconds() / 3600, 2),'rate_per_hour': i.cost_per_hour,'total_amount': i.total_cost})
     return render_template('receipt.html', receipts=receipts)
 
 #settings route
