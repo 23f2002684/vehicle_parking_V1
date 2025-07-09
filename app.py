@@ -455,18 +455,6 @@ def manage_users():
     users = User.query.all()
     lots = ParkingLot.query.all()
     return render_template('manage_users.html', users=users, lots=lots)
-
-@app.route('/users')
-@admin_required
-def get_users():
-    users = User.query.all()
-    return jsonify([
-        {
-            'id': user.id,
-            'username': user.username,
-            'is_banned': user.is_banned
-        } for user in users
-    ])
     
 @app.route('/ban_user/<int:user_id>', methods=['POST'])
 @admin_required
