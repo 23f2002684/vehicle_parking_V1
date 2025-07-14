@@ -106,12 +106,13 @@ def user_login():
 @app.route('/admin_login', methods=['GET', 'POST'])
 def admin_login():
     if request.method=='POST':
-        username=request.form['username']
-        password=request.form['password']
-        if username == 'admin' and password=='unique1234':
+        a_username=request.form['username']
+        a_password=request.form['password']
+        if a_username=='PAadmin' and a_password=='unique1234':
             session['admin_logged_in']=True
             return redirect(url_for('admin_dashboard'))
-        flash('Invalid admin credentials...', 'danger')
+        else:
+            flash('Invalid admin credentials!!!', 'danger')
     return render_template('admin_login.html')
 
 #dashboard routes
@@ -160,8 +161,14 @@ def admin_dashboard():
             last_reservation=Reservation.query.filter_by(
                 spot_id=selected_spot.id
             ).order_by(Reservation.parking_timestamp.desc()).first()
-            vehicle=last_reservation.vehicle if last_reservation else None
-            reservation=last_reservation if selected_spot.status=='O' else None
+            if last_reservation:
+                vehicle=last_reservation.vehicle
+            else:
+                vehicle=None
+            if selected_spot.status=='O':
+                reservation=last_reservation
+            else:
+                reservation=None
         if reservation:
             vehicle=reservation.vehicle
     return render_template('admin_dashboard.html',spots=spots,selected_spot=selected_spot,total_users=total_users,total_lots=total_lots,reservation=reservation,lots=lots,vehicle=vehicle)
