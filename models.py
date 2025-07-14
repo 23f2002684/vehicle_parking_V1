@@ -8,76 +8,66 @@ db= SQLAlchemy()
 #Creating the database models
 #user table
 class User(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(80), unique=True, nullable=False)
-    fullname = db.Column(db.String(100), nullable=True)
-    email = db.Column(db.String(120), unique=True, nullable=False)
-    password = db.Column(db.String(50), nullable=False)
-    dob = db.Column(db.Date, nullable=True)
-    state = db.Column(db.String(50), nullable=True)
-    is_admin = db.Column(db.Boolean, default=False)
-    is_banned = db.Column(db.Boolean, default=False)
-    reservations = db.relationship('Reservation', backref='user', lazy=True)
+    id=db.Column(db.Integer, primary_key=True)
+    username=db.Column(db.String(80), unique=True, nullable=False)
+    fullname=db.Column(db.String(100), nullable=True)
+    email=db.Column(db.String(120), unique=True, nullable=False)
+    password=db.Column(db.String(50), nullable=False)
+    dob=db.Column(db.Date, nullable=False)
+    state=db.Column(db.String(50), nullable=False)
+    is_admin=db.Column(db.Boolean, default=False)
+    is_banned=db.Column(db.Boolean, default=False)
+    reservations=db.relationship('Reservation', backref='user', lazy=True)
 
 
 #parking lot table
 class ParkingLot(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    prime_location_name = db.Column(db.String(150), nullable=False)
-    price_per_hour = db.Column(db.Float, nullable=False)
-    address = db.Column(db.String(200), nullable=False)
-    pin_code = db.Column(db.String(12), nullable=False)
-    max_spots = db.Column(db.Integer, nullable=False)
-    spots = db.relationship('ParkingSpot', backref='lot', lazy=True)
+    id=db.Column(db.Integer, primary_key=True)
+    prime_location_name=db.Column(db.String(150), nullable=False)
+    price_per_hour=db.Column(db.Float, nullable=False)
+    address=db.Column(db.String(200), nullable=False)
+    pin_code=db.Column(db.String(12), nullable=False)
+    max_spots=db.Column(db.Integer, nullable=False)
+    spots=db.relationship('ParkingSpot', backref='lot', lazy=True)
 
 
 #parking spot table
 class ParkingSpot(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    
+    id=db.Column(db.Integer, primary_key=True)
     # Foreign key to ParkingLot
-    lot_id = db.Column(db.Integer, db.ForeignKey('parking_lot.id'), nullable=False)
-    
-    status = db.Column(db.String(1), default='A')  # A = Available, O = Occupied
-    spot_number = db.Column(db.String(10), nullable=False)
-
+    lot_id=db.Column(db.Integer, db.ForeignKey('parking_lot.id'), nullable=False)
+    status=db.Column(db.String(1), default='A')  # A = Available, O = Occupied
+    spot_number=db.Column(db.String(10), nullable=False)
     # One-to-One: A spot can have one reservation at a time
-    reservation = db.relationship('Reservation', backref='spot', uselist=False)
-    
+    reservation=db.relationship('Reservation', backref='spot', uselist=False)
+
 #reservation parking lot table
 class Reservation(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-
+    id=db.Column(db.Integer, primary_key=True)
     # Foreign key to ParkingSpot
-    spot_id = db.Column(db.Integer, db.ForeignKey('parking_spot.id'), nullable=False)
-
+    spot_id=db.Column(db.Integer, db.ForeignKey('parking_spot.id'), nullable=False)
     # Foreign key to User
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    
+    user_id=db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     # Foreign key to Vehicle
-    vehicle_id = db.Column(db.Integer, db.ForeignKey('vehicle.id'), nullable=True)
-    
-    parking_timestamp = db.Column(db.DateTime, default=datetime.utcnow)
-    leaving_timestamp = db.Column(db.DateTime, nullable=True)
-
-    cost_per_hour = db.Column(db.Float, nullable=False)
-    total_cost = db.Column(db.Float, default=0.0)
-    status = db.Column(db.String(20), default='Pending')
-
+    vehicle_id=db.Column(db.Integer, db.ForeignKey('vehicle.id'), nullable=True)
+    parking_timestamp=db.Column(db.DateTime, default=datetime.utcnow)
+    leaving_timestamp=db.Column(db.DateTime, nullable=True)
+    cost_per_hour=db.Column(db.Float, nullable=False)
+    total_cost=db.Column(db.Float, default=0.0)
+    status=db.Column(db.String(20), default='Pending')
     # Method to compute total bill after leaving
     def calculate_total_cost(self):
         if self.leaving_timestamp and self.parking_timestamp:
-            duration_hours = (self.leaving_timestamp - self.parking_timestamp).total_seconds() / 3600
-            self.total_cost = round(duration_hours * self.cost_per_hour, 2)
+            duration_hours=(self.leaving_timestamp-self.parking_timestamp).total_seconds()/3600
+            self.total_cost=round(duration_hours*self.cost_per_hour, 2)
             return self.total_cost
         return 0.0
     
 class Vehicle(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    brand = db.Column(db.String(50), nullable=False)
-    model_name = db.Column(db.String(50), nullable=False)
-    vehicle_class = db.Column(db.String(20), nullable=False)
-    vehicle_type = db.Column(db.String(20), nullable=False)
-    registration_number = db.Column(db.String(20), nullable=False)
-    reservations = db.relationship('Reservation', backref='vehicle', lazy=True)
-#A decent amount of normlization has been done
+    id=db.Column(db.Integer, primary_key=True)
+    brand=db.Column(db.String(50), nullable=False)
+    model_name=db.Column(db.String(50), nullable=False)
+    vehicle_class=db.Column(db.String(20), nullable=False)
+    vehicle_type=db.Column(db.String(20), nullable=False)
+    registration_number=db.Column(db.String(20), nullable=False)
+    reservations=db.relationship('Reservation', backref='vehicle', lazy=True)

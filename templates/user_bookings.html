@@ -217,8 +217,8 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   </div>
   <script>
-  const userMonths = {{ user_months|tojson }};
-  const userCosts = {{ user_costs|tojson }};
+  const userMonths = {{ months|tojson }};
+  const userCosts = {{ costs|tojson }};
 
   new Chart(document.getElementById('userCostLine').getContext('2d'), {
     type: 'line',

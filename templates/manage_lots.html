@@ -173,10 +173,10 @@
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     </div>
     <script>
-    const adminLotNames = {{ admin_lot_names|tojson }};
-    const adminMaxSpots = {{ admin_max_spots|tojson }};
-    const adminOccupied = {{ admin_occupied|tojson }};
-    const adminAvailable = {{ admin_available|tojson }};
+    const adminLotNames = {{ lot_names|tojson }};
+    const adminMaxSpots = {{ max_spots|tojson }};
+    const adminOccupied = {{ occupied_count|tojson }};
+    const adminAvailable = {{ available_count|tojson }};
 
     new Chart(document.getElementById('lotSpotsChart').getContext('2d'), {
         type: 'bar',
