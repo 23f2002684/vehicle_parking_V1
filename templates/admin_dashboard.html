@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
-    <link rel="stylesheet" href="styles.css">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -140,7 +139,7 @@
 
     <div class="main-content">
         <div class="logo-container">
-            <img src="{{ url_for('static', filename='../static/images/parker_avenue_logo.png') }}" alt=" ">
+            <img src="{{ url_for('static', filename='../static/parker_avenue_logo.png') }}" alt=" ">
         </div>
         <h1>Welcome, Admin!</h1>
         <p>Here you can view stats and manage parking lots.</p>
@@ -154,7 +153,7 @@
         </div>
 
         <div class="spot-search-section">
-            <h4>Search Parking Spot Status & Vehicle Details</h4>
+            <h4>Search Parking Spot Status&Vehicle Details</h4>
             <form method="POST">
                 <label for="spot_id">Select Parking Spot:</label>
                 <select name="spot_id" id="spot_id" required>
