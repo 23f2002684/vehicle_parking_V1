@@ -200,43 +200,43 @@
         }
         @media screen and (max-width: 900px) 
         {
-            .settings-flex-row {
+            .settings-flex-row{
                 flex-direction:column;
                 align-items:flex-end;
             }
-            .setting-container {
+            .setting-container{
                 margin-right:20px;
             }
-            .logo-container {
+            .logo-container{
                 margin-top:5px;
                 margin-bottom:30px;
             }
         }
         @media screen and (max-width: 600px) 
         {
-            .main-content {
+            .main-content{
                 margin-left:0;
                 padding:16px 0 0 0;
             }
-            .sidebar {
+            .sidebar{
                 position:static;
                 width:100%;
                 height:auto;
             }
-            .settings-flex-row {
+            .settings-flex-row{
                 flex-direction:column;
                 align-items:flex-end;
             }
-            .setting-container {
+            .setting-container{
                 width:100%;
                 min-width:0;
                 margin-right:0;
             }
-            .logo-container img {
+            .logo-container img{
                 width:80px;
                 height:80px;
             }
-            .logout-button {
+            .logout-button{
             background-color:#444;
             color:#fff;
             padding:10px 18px;
@@ -244,160 +244,147 @@
             border-radius:6px;
             cursor:pointer;
         }
-        .logout-button:hover {
+        .logout-button:hover{
             background-color:#222;
         }
-        .alert {
+        .alert{
             padding:12px 18px;
             border-radius:5px;
             margin-bottom:18px;
         }
-        .alert-success { background: #d4edda; color: #155724; }
-        .alert-danger { background: #f8d7da; color: #721c24; }
-        .alert-warning { background: #fff3cd; color: #856404; }
-        .alert-info { background: #d1ecf1; color: #0c5460; }
+        .alert-success{background: #d4edda; color: #155724;}
+        .alert-danger{background: #f8d7da; color: #721c24;}
+        .alert-warning{background: #fff3cd; color: #856404;}
+        .alert-info{background: #d1ecf1; color: #0c5460;}
         }
     </style>
 </head>
 <body>
-    <div class="sidebar">
-        <h2>User Dashboard</h2>
-        <a href="{{url_for('user_dashboard')}}">Dashboard</a>
-        <a href="{{url_for('user_bookings')}}">Bookings</a>
-        <a href="{{url_for('user_profile')}}">Profile</a>
-        {% if reservations and reservations|length>0 %}
-            <a href="{{ url_for('book_status', booking_id=reservations[0].id) }}">Booking Status</a>
-        {% else %}
-            <span><b>No bookings yet</b></span>
-        {% endif %}
-        <a href="{{url_for('settings')}}">Settings</a>
-    </div>
-    <div class="main-content">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-          {% if messages %}
-            {% for category, message in messages %}
-              <div class="alert alert-{{ category }}">{{ message }}</div>
-            {% endfor %}
-          {% endif %}
-        {% endwith %}
-        <h1>Settings</h1>
-        <p>Change the platform settings here.</p>
-        <div class="settings-flex-row">
-            <div class="setting-container">
-                <div class="setting-section">
-                    <h3>Account Information</h3>
-                    <p>Email: {{ user.email }}</p>
-                    <p>Username: {{ user.username }}</p>
-                </div>
-                <div class="setting-section">
-                    <h3>Appearance</h3>
-                    <label>Dark Mode:
-                        <label class="switch">
-                            <input type="checkbox" id="darkToggle">
-                            <span class="slider"></span>
-                        </label>
-                    </label>
-                </div>
-                <div class="setting-section">
-                    <h3>Notifications</h3>
-                    <label>Enable Email Alerts:
-                        <label class="switch">
-                            <input type="checkbox" checked>
-                            <span class="slider"></span>
-                        </label>
-                    </label>
-                </div>
-                <div class="setting-section">
-                    <h3>Security</h3>
-                    <button class="button" onclick="openModal()">Change Password</button>
-                </div>
-                <div class="setting-section">
-                    <h3>Ask for Help</h3>
-                    <form class="help-form" onsubmit="handleHelp(event)">
-                        <textarea placeholder="Describe your issue or question..."></textarea>
-                        <div>
-                        <button class="button" type="submit">Submit</button>
-                        </div>
-                    </form>
-                    <p id="help-response" style="color: green;"></p>
-                </div>
-                <div class="setting-section">
-                    <h3>Logout</h3>
-                    <p>This will log you out of the platform.</p>
-                    <p>Wish to continue?</p>
-                    <form action="{{ url_for('logout') }}" method="POST" style="display:inline;">
-                        <button class="logout-button" type="submit">Logout</button>
-                    </form>
-                </div>
-                <div class="setting-section">
-                    <h3>Delete Account</h3>
-                    <p>This action is irreversible. All your data will be permanently deleted.</p>
-                    <button class="delete-button" onclick="openDeleteModal()">Delete My Account</button>
-                </div>
-                <div id="passwordmodal" class="modal">
-                    <form class="modal-content" method="POST" action="{{ url_for('change_password') }}">
-                        <span class="close" onclick="closeModal()">&times;</span>
-                        <h3>Change Password</h3>
-                        <input type="password" name="current_password" placeholder="Current Password" required>
-                        <input type="password" name="new_password" placeholder="New Password" required>
-                        <input type="password" name="confirm_password" placeholder="Confirm New Password" required>
-                        <button class="button" type="submit">Update Password</button>
-                    </form>
-                </div>
-                <div id="deletemodal" class="modal">
-                    <div class="modal-content">
-                        <span class="close" onclick="closeDeleteModal()">&times;</span>
-                        <h3>Confirm Account Deletion</h3>
-                        <p>Are you sure you want to delete your account? This cannot be undone.</p>
-                        <form method="POST" action="{{ url_for('delete_account') }}">
-                            <button class="delete-button" type="submit">Yes, Delete My Account</button>
-                            <button class="button" type="button" onclick="closeDeleteModal()">Cancel</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-            <div class="logo-container">
-                <img src="{{ url_for('static', filename='../static/parker_avenue_logo.png') }}" alt="">
-            </div>
+  <div class="sidebar">
+    <h2>User Dashboard</h2>
+    <a href="{{ url_for('user_dashboard') }}">Dashboard</a>
+    <a href="{{ url_for('user_bookings') }}">Bookings</a>
+    <a href="{{ url_for('user_profile') }}">Profile</a>
+    {% if reservations and reservations|length>0 %}
+      <a href="{{ url_for('book_status', booking_id=reservations[0].id) }}">Booking Status</a>
+    {% else %}
+      <span><b>No bookings yet</b></span>
+    {% endif %}
+    <a href="{{ url_for('settings') }}">Settings</a>
+  </div>
+  <div class="main-content">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+    <h1>Settings</h1>
+    <p>Use this page to manage your account and settings.</p>
+    <div class="settings-flex-row">
+      <div class="setting-container">
+        <div class="setting-section">
+          <h3>Account Info</h3>
+          <p>Email: {{ user.email }}</p>
+          <p>Username: {{ user.username }}</p>
         </div>
+        <div class="setting-section">
+          <h3>Appearance</h3>
+          <label>Dark Mode:
+            <label class="switch">
+              <input type="checkbox" id="darkToggle" />
+              <span class="slider"></span>
+            </label>
+          </label>
+        </div>
+        <div class="setting-section">
+          <h3>Notifications</h3>
+          <label>Email Alerts:
+            <label class="switch">
+              <input type="checkbox" checked />
+              <span class="slider"></span>
+            </label>
+          </label>
+        </div>
+        <div class="setting-section">
+          <h3>Security</h3>
+          <button class="button" onclick="openModal()">Change Password</button>
+        </div>
+        <div class="setting-section">
+          <h3>Contact Support</h3>
+          <form class="help-form" onsubmit="handleHelp(event)">
+            <textarea placeholder="Briefly describe your issue..."></textarea>
+            <div>
+              <button class="button" type="submit">Submit</button>
+            </div>
+          </form>
+          <p id="help-response" style="color: green;"></p>
+        </div>
+        <div class="setting-section">
+          <h3>Logout</h3>
+          <p>You’ll be signed out from your session.</p>
+          <form action="{{ url_for('logout') }}" method="POST">
+            <button class="logout-button" type="submit">Logout</button>
+          </form>
+        </div>
+        <div class="setting-section">
+          <h3>Delete Account</h3>
+          <p>This process is permanent— all your data will be removed.</p>
+          <button class="delete-button" onclick="openDeleteModal()">Delete My Account</button>
+        </div>
+        <div id="passwordmodal" class="modal">
+          <form class="modal-content" method="POST" action="{{ url_for('change_password') }}">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h3>Update Your Password</h3>
+            <input type="password" name="current_password" placeholder="Current Password" required />
+            <input type="password" name="new_password" placeholder="New Password" required />
+            <input type="password" name="confirm_password" placeholder="Confirm New Password" required />
+            <button class="button" type="submit">Save Password</button>
+          </form>
+        </div>
+        <div id="deletemodal" class="modal">
+          <div class="modal-content">
+            <span class="close" onclick="closeDeleteModal()">&times;</span>
+            <h3>Confirm Delete</h3>
+            <p>Are you sure you want to delete your account? This action can't be undone.</p>
+            <form method="POST" action="{{ url_for('delete_account') }}">
+              <button class="delete-button" type="submit">Yes, Delete</button>
+              <button class="button" type="button" onclick="closeDeleteModal()">Cancel</button>
+            </form>
+          </div>
+        </div>
+      </div>
+      <div class="logo-container">
+        <img src="{{ url_for('static', filename='../static/parker_avenue_logo.png') }}" alt=" " />
+      </div>
     </div>
-    <script>
-        const darkToggle = document.getElementById('darkToggle');
-        darkToggle.addEventListener('change', ()=>{
-            document.body.classList.toggle('dark-mode');
-        });
-
-        function openModal() 
-        {
-            document.getElementById('passwordmodal').style.display='flex';
-        }
-
-        function closeModal() 
-        {
-            document.getElementById('passwordmodal').style.display='none';
-        }
-        function openDeleteModal() 
-        {
-            document.getElementById('deletemodal').style.display='flex';
-        }
-
-        function closeDeleteModal() 
-        {
-            document.getElementById('deletemodal').style.display='none';
-        }
-        window.onclick=function(event) {
-            if (event.target===document.getElementById('passwordmodal')) {
-                closeModal();
-            }
-            else if (event.target===document.getElementById('deletemodal')) {
-                closeDeleteModal();
-            }
-        };
-        function handleHelp(event) 
-        {
-            event.preventDefault();
-            document.getElementById('help-response').textContent="Thank you! We'll get back to you soon.";
-        }
-    </script>
+  </div>
+  <script>
+    const darkToggle=document.getElementById('darkToggle');
+    darkToggle.addEventListener('change', ()=>{
+      document.body.classList.toggle('dark-mode');
+    });
+    function openModal(){
+      document.getElementById('passwordmodal').style.display='flex';
+    }
+    function closeModal(){
+      document.getElementById('passwordmodal').style.display='none';
+    }
+    function openDeleteModal(){
+      document.getElementById('deletemodal').style.display='flex';
+    }
+    function closeDeleteModal(){
+      document.getElementById('deletemodal').style.display='none';
+    }
+    window.onclick=function (event){
+      if (event.target===document.getElementById('passwordmodal'))closeModal();
+      else if (event.target===document.getElementById('deletemodal'))closeDeleteModal();
+    };
+    function handleHelp(event){
+      event.preventDefault();
+      document.getElementById('help-response').textContent="Thank you! We'll get back to you soon.";
+    }
+  </script>
 </body>
 </html>

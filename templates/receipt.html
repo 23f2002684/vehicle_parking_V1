@@ -1,170 +1,176 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Online Parking Receipts</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            margin: 0;
-        }
-        .sidebar {
-            width: 250px;
-            background-color: #2f3b52;
-            color: #fff;
-            padding-top: 20px;
-            height: 100vh;
-            position: fixed;
-        }
-        .sidebar h2 {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .sidebar a {
-            color: white;
-            padding: 15px;
-            text-decoration: none;
-            display: block;
-            font-size: 18px;
-        }
-        .sidebar a:hover {
-            background-color: #1e2a38;
-        }
-        .main-content {
-            margin-left: 250px;
-            padding: 20px;
-            width: 100%;
-        }
-        .main-content h1 {
-            font-size: 24px;
-            color: #333;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            background-color: white;
-        }
-        th, td {
-            padding: 12px;
-            border: 1px solid #ddd;
-            text-align: left;
-        }
-        .print-btn {
-            margin-top: 20px;
-            padding: 10px 20px;
-            background-color: teal;
-            color: white;
-            border: none;
-            cursor: pointer;
-            border-radius: 6px;
-        }
-        .print-btn:hover {
-            background-color: #0f7d7d;
-        }
-        .logo-container {
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            text-align: right;
-        }
-        .logo-container img {
-            height: 70px;
-            width: 70px;
-        }
-        @media screen and (max-width: 768px) {
-            .sidebar {
-                width: 200px;
-            }
-            .main-content {
-                margin-left: 200px;
-            }
-            .logo-container {
-                top: 5px;
-                right: 5px;
-            }
-        }
-        @media print {
-            .action-col, .print-btn, .print-btn * {
-                display: none !important;
-            }
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Parking Receipts</title>
+  <style>
+    body {
+      font-family:Arial, sans-serif;
+      display:flex;
+      margin:0;
+    }
+    .sidebar{
+      width:250px;
+      background-color: #2f3b52;
+      color:#fff;
+      padding-top:20px;
+      height:100vh;
+      position:fixed;
+    }
+    .sidebar h2{
+      text-align:center;
+      margin-bottom:20px;
+    }
+    .sidebar a{
+      color:white;
+      padding:15px;
+      text-decoration:none;
+      display:block;
+      font-size:18px;
+    }
+    .sidebar a:hover{
+      background-color: #1e2a38;
+    }
+    .main-content{
+      margin-left:250px;
+      padding:20px;
+      width:100%;
+    }
+    .main-content h1 {
+      font-size: 24px;
+      color: #333;
+    }
+    .main-content p{
+      font-size:15px;
+      color:#555;
+      margin-top:6px;
+    }
+    table{
+      width:100%;
+      border-collapse:collapse;
+      margin-top:20px;
+      background-color:white;
+    }
+    th, td{
+      padding:12px;
+      border:1px solid #ddd;
+      text-align:left;
+    }
+    th{
+      background: #f0f4f8;
+    }
+    .print-btn{
+      margin-top:0;
+      padding:8px 14px;
+      background-color:teal;
+      color:white;
+      border:none;
+      cursor:pointer;
+      border-radius:6px;
+    }
+    .print-btn:hover{
+      background-color: #0f7d7d;
+    }
+    .logo-container{
+      position:absolute;
+      top:5px;
+      right:5px;
+      text-align:right;
+    }
+    .logo-container img{
+      height:70px;
+      width:70px;
+    }
+    @media screen and (max-width:768px){
+      .sidebar{
+        width:200px;
+      }
+      .main-content{
+        margin-left:200px;
+      }
+      .logo-container{
+        top:5px;
+        right:5px;
+      }
+    }
+    @media print{
+      .action-col, .print-btn, .print-btn*{
+        display: none;
+      }
+    }
+  </style>
 </head>
 <body>
-    <div class="sidebar">
-        <h2>Admin Dashboard</h2>
-        <a href="{{ url_for('admin_dashboard') }}">Dashboard</a>
-        <a href="{{ url_for('manage_users') }}">Manage Users</a>
-        <a href="{{ url_for('manage_lots') }}">Manage Lots</a>
-        <a href="{{ url_for('receipts') }}">System Generated Parking Receipts</a>
+  <div class="sidebar">
+    <h2>Admin Dashboard</h2>
+    <a href="{{ url_for('admin_dashboard') }}">Dashboard</a>
+    <a href="{{ url_for('manage_users') }}">Manage Users</a>
+    <a href="{{ url_for('manage_lots') }}">Manage Lots</a>
+    <a href="{{ url_for('receipts') }}">Parking Receipts</a>
+  </div>
+  <div class="main-content">
+    <div class="logo-container">
+      <img src="{{ url_for('static', filename='../static/parker_avenue_logo.png') }}" alt=" " />
     </div>
-
-    <div class="main-content">
-        <div class="logo-container">
-            <img src="{{ url_for('static', filename='../static/parker_avenue_logo.png') }}" alt=" ">
-        </div>
-        <h1>System Generated Parking Receipts</h1>
-        <p>Below are the generated receipts for parking and will be handed over physically.</p>
-
-        <table id="receiptTable">
-            <thead>
-                <tr>
-                    <th>Full Name</th>
-                    <th>Username</th>
-                    <th>Parking Spot</th>
-                    <th>Booking Date</th>
-                    <th>Start Time</th>
-                    <th>Hours Parked</th>
-                    <th>Rate/hr (₹)</th>
-                    <th>Total Amount (₹)</th>
-                    <th class="action-col">Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for receipt in receipts %}
-                <tr id="receipt-row-{{ receipt.id }}">
-                    <td>{{ receipt.fullname }}</td>
-                    <td>{{ receipt.username }}</td>
-                    <td>{{ receipt.parking_spot }}</td>
-                    <td>{{ receipt.booking_date }}</td>
-                    <td>{{ receipt.start_time }}</td>
-                    <td>{{ receipt.hours_parked }}</td>
-                    <td>{{ receipt.rate_per_hour }}</td>
-                    <td>{{ receipt.total_amount }}</td>
-                    <td class="action-col">
-                        <button class="print-btn" onclick="printRow('receipt-row-{{ receipt.id }}')">Print/Download</button>
-        </td>
-    </tr>
-    {% endfor %}
-            </tbody>
-        </table>
-        <script>
-            function printRow(rowId) {
-            var row = document.getElementById(rowId).cloneNode(true);
-            var printWindow = window.open('', '', 'width=800,height=600');
-            printWindow.document.write('<html><head><title>Parking Receipt</title>');
-            printWindow.document.write('<style>table{width:100%;border-collapse:collapse;}th,td{padding:12px;border:1px solid #ddd;text-align:left;}body{font-family:Arial,sans-serif;}</style>');
-            printWindow.document.write('</head><body>');
-            printWindow.document.write('<h2>Parking Receipt</h2>');
-            printWindow.document.write('<table>');
-            printWindow.document.write('<tr>');
-            var headers = document.querySelectorAll('#receiptTable th:not(.action-col)');
-            headers.forEach(function(th) {
-                printWindow.document.write('<th>' + th.innerText + '</th>');
-            });
-            printWindow.document.write('</tr>');
-            var actionCell = row.querySelector('.action-col');
-            if (actionCell) actionCell.parentNode.removeChild(actionCell);
-            printWindow.document.write(row.outerHTML);
-            printWindow.document.write('</table>');
-            printWindow.document.write('</body></html>');
-            printWindow.document.close();
-            printWindow.print();
-        }
-        </script>
-    </div>
+    <h1>System Generated Parking Receipts</h1>
+    <p>Here you can view and print all system-generated receipts. They will be physically handed at the office.</p>
+    <table id="receiptTable">
+      <thead>
+        <tr>
+          <th>Full Name</th>
+          <th>Username</th>
+          <th>Parking Spot</th>
+          <th>Booking Date</th>
+          <th>Start Time</th>
+          <th>Hours Parked</th>
+          <th>Rate/hr (₹)</th>
+          <th>Total (₹)</th>
+          <th class="action-col">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for receipt in receipts %}
+        <tr id="receipt-row-{{ receipt.id }}">
+          <td>{{ receipt.fullname }}</td>
+          <td>{{ receipt.username }}</td>
+          <td>{{ receipt.parking_spot }}</td>
+          <td>{{ receipt.booking_date }}</td>
+          <td>{{ receipt.start_time }}</td>
+          <td>{{ receipt.hours_parked }}</td>
+          <td>{{ receipt.rate_per_hour }}</td>
+          <td>{{ receipt.total_amount }}</td>
+          <td class="action-col">
+            <button class="print-btn" onclick="printRow('receipt-row-{{ receipt.id }}')">Print</button>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <script>
+      function printRow(rowId) {
+        const row=document.getElementById(rowId).cloneNode(true);
+        const printWindow=window.open('', '', 'width=800,height=600');
+        printWindow.document.write('<html><head><title>Parking Receipt</title>');
+        printWindow.document.write('<style>');
+        printWindow.document.write('table{width:100%;border-collapse:collapse;margin-top:20px}th,td{padding:12px;border:1px solid #ddd;text-align:left}body{font-family:Arial,sans-serif;margin:20px}');
+        printWindow.document.write('</style>');
+        printWindow.document.write('</head><body>');
+        printWindow.document.write('<h2>Parking Receipt</h2>');
+        printWindow.document.write('<table><tr>');
+        const headers = document.querySelectorAll('#receiptTable th:not(.action-col)');
+        headers.forEach(th=>{
+          printWindow.document.write('<th>'+th.innerText+'</th>');
+        });
+        printWindow.document.write('</tr>');
+        const actionCell=row.querySelector('.action-col');
+        if (actionCell) actionCell.parentNode.removeChild(actionCell);
+        printWindow.document.write(row.outerHTML);
+        printWindow.document.write('</table></body></html>');
+        printWindow.document.close();
+        printWindow.print();
+      }
+    </script>
+  </div>
 </body>
 </html>

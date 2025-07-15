@@ -1,224 +1,335 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            margin: 0;
-        }
-        .sidebar {
-            width: 250px;
-            background-color: #2f3b52;
-            color: #fff;
-            padding-top: 20px;
-            height: 100vh;
-            position: fixed;
-        }
-        .sidebar h2 {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .sidebar a {
-            color: white;
-            padding: 15px;
-            text-decoration: none;
-            display: block;
-            font-size: 18px;
-        }
-        .sidebar a:hover {
-            background-color: #1e2a38;
-        }
-        .main-content {
-            margin-left: 250px;
-            padding: 20px;
-            width: 100%;
-        }
-        .main-content h1 {
-            font-size: 28px;
-            color: #333;
-        }
-        .btn {
-            background-color: #00796b;
-            color: white;
-            border: none;
-            padding: 10px 18px;
-            border-radius: 5px;
-            text-decoration: none;
-            font-size: 16px;
-            margin-right: 8px;
-            transition: background 0.2s;
-            cursor: pointer;
-            display: inline-block;
-        }
-        .btn:hover {
-            background-color: #004d40;
-        }
-        .btn.delete {
-            background-color: #d32f2f;
-        }
-        .btn.delete:hover {
-            background-color: #a31515;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 18px;
-        }
-        th, td {
-            padding: 10px 8px;
-            border-bottom: 1px solid #ddd;
-            text-align: left;
-        }
-        th {
-            background: #f0f4f8;
-        }
-        .setting-section {
-            text-align: right;
-            margin-right: 20px;
-            padding: 15px;
-            background-color: #f9f9f9;
-            border-radius: 5px;
-        }
-        .logo-container {
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            text-align: right;
-        }
-        .logo-container img {
-            height: 90px;
-            width: 90px;
-        }
-        .spot-search-section {
-            margin: 32px 0 24px 0;
-            padding: 20px;
-            background: #f6f8fa;
-            border-radius: 8px;
-            max-width: 600px;
-        }
-        .vehicle-info {
-            background: #e3f2fd;
-            border-radius: 8px;
-            padding: 14px 18px;
-            margin-top: 14px;
-        }
-        .status-available {
-            color: #388e3c;
-            font-weight: bold;
-        }
-        .status-occupied {
-            color: #c62828;
-            font-weight: bold;
-        }
-        @media screen and (max-width: 768px) {
-            .sidebar {
-                width: 200px;
-            }
-            .main-content {
-                margin-left: 200px;
-            }
-            .logo-container {
-                top: 5px;
-                right: 5px;
-            }
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin Dashboard</title>
+  <style>
+    body{
+      font-family:Arial, sans-serif;
+      display:flex;
+      margin:0;
+      background: #f4f6fa;
+    }
+    .sidebar{
+      width:250px;
+      background-color: #2f3b52;
+      color:#fff;
+      padding-top:24px;
+      height:100vh;
+      position:fixed;
+      box-shadow:2px 0 8px rgba(0,0,0,0.04);
+    }
+    .sidebar h2{
+      text-align:center;
+      margin-bottom:28px;
+      letter-spacing:1px;
+      font-size:1.7rem;
+    }
+    .sidebar a{
+      color:white;
+      padding:15px 24px;
+      text-decoration:none;
+      display:block;
+      font-size:18px;
+      border-left:4px solid transparent;
+      transition:background 0.2s,border-color 0.2s;
+    }
+    .sidebar a:hover,
+    .sidebar a:focus{
+      background-color:#1e2a38;
+      border-left:4px solid #ffeb3b;
+      outline:none;
+    }
+    .main-content {
+      margin-left:250px;
+      padding:32px 24px 24px 24px;
+      width: 100%;
+      min-height: 100vh;
+    }
+    .logo-container{
+      position:absolute;
+      top:18px;
+      right:32px;
+      text-align:right;
+    }
+    .logo-container img{
+      height:72px;
+      width:72px;
+      border-radius:12px;
+      background:#fff;
+      box-shadow:0 2px 8px rgba(0,0,0,0.07);
+    }
+    h1 {
+      font-size:2.1rem;
+      color: #00796b;
+      margin-bottom:8px;
+    }
+    p.subtext{
+      color:#444;
+      margin-bottom:20px;
+      font-size:1.1rem;
+    }
+    .btn{
+      background-color: #00796b;
+      color:white;
+      border:none;
+      padding:11px 22px;
+      border-radius:5px;
+      text-decoration:none;
+      font-size:16px;
+      margin-right:8px;
+      transition: background 0.2s;
+      cursor: pointer;
+      display: inline-block;
+      margin-bottom:18px;
+    }
+    .btn:hover,
+    .btn:focus{
+      background-color: #004d40;
+      outline:none;
+    }
+    .btn.delete{
+      background-color: #d32f2f;
+    }
+    .btn.delete:hover,
+    .btn.delete:focus{
+      background-color: #a31515;
+    }
+    .setting-section{
+      text-align:right;
+      margin:24px 0 12px 0;
+      padding:18px 20px;
+      background-color:#f9f9f9;
+      border-radius:7px;
+      box-shadow:0 1px 4px rgba(0,0,0,0.04);
+      display:inline-block;
+      float:right;
+    }
+    .setting-section h3 {
+      margin:0 0 6px 0;
+      font-size:1.1rem;
+      color: #2f3b52;
+    }
+    .setting-section p{
+      margin:0 0 10px 0;
+      font-size:0.97rem;
+      color:#666;
+    }
+    .spot-search-section{
+      margin:38px 0 26px 0;
+      padding:22px 24px;
+      background:#f6f8fa;
+      border-radius:10px;
+      max-width:600px;
+      box-shadow:0 1px 6px rgba(0,0,0,0.04);
+    }
+    .spot-search-section h4 {
+      margin-bottom:14px;
+      color:#00796b;
+      font-size:1.15rem;
+    }
+    .spot-search-section label {
+      font-weight:500;
+      margin-right:8px;
+    }
+    .spot-search-section select {
+      padding:7px 10px;
+      border-radius:4px;
+      border:1px solid #bdbdbd;
+      margin-right:8px;
+      font-size:1rem;
+    }
+    .vehicle-info{
+      background:#e3f2fd;
+      border-radius:8px;
+      padding:14px 18px;
+      margin-top:14px;
+      color:#222;
+      font-size:1.03rem;
+      box-shadow:0 1px 4px rgba(0,0,0,0.03);
+    }
+    .vehicle-info-details {
+      margin-top:7px;
+      font-size:0.98rem;
+      color:#444;
+    }
+    .status-available {
+      color: #388e3c;
+      font-weight:bold;
+    }
+    .status-occupied {
+      color: #c62828;
+      font-weight:bold;
+    }
+    .alert {
+      padding:8px 14px;
+      border-radius:5px;
+      background:#fff3cd;
+      color:#856404;
+      margin-top:10px;
+      font-size:1rem;
+    }
+    table{
+      width:100%;
+      border-collapse:collapse;
+      margin-top:32px;
+      background:#fff;
+      border-radius:8px;
+      overflow:hidden;
+      box-shadow:0 2px 10px rgba(0,0,0,0.06);
+    }
+    th,
+    td{
+      padding:12px 10px;
+      border-bottom:1px solid #e0e0e0;
+      text-align: left;
+    }
+    th{
+      background:#f0f4f8;
+      font-weight:600;
+      color:#2f3b52;
+    }
+    tr:last-child td{
+      border-bottom:none;
+    }
+    @media screen and (max-width: 900px){
+      .sidebar{
+        width:180px;
+      }
+      .main-content{
+        margin-left:180px;
+        padding:18px 8px 8px 8px;
+      }
+      .logo-container{
+        top:10px;
+        right:12px;
+      }
+    }
+    @media screen and (max-width: 600px){
+      .sidebar{
+        position:static;
+        width:100%;
+        height:auto;
+        box-shadow:none;
+      }
+      .main-content{
+        margin-left:0;
+        padding:8px 2vw;
+      }
+      .logo-container{
+        position:static;
+        margin-bottom:12px;
+        text-align:left;
+      }
+      .setting-section{
+        float:none;
+        text-align:left;
+      }
+    }
+  </style>
 </head>
 <body>
-    <div class="sidebar">
-        <h2>Admin Dashboard</h2>
-        <a href="{{ url_for('admin_dashboard') }}">Dashboard</a>
-        <a href="{{ url_for('manage_users') }}">Manage Users</a>
-        <a href="{{ url_for('manage_lots') }}">Manage Lots</a>
-        <a href="{{ url_for('receipts') }}">Receipts</a>
+  <nav class="sidebar" aria-label="Admin Navigation">
+    <h2>Admin Dashboard</h2>
+    <a href="{{ url_for('admin_dashboard') }}">Dashboard</a>
+    <a href="{{ url_for('manage_users') }}">Manage Users</a>
+    <a href="{{ url_for('manage_lots') }}">Manage Lots</a>
+    <a href="{{ url_for('receipts') }}">Receipts</a>
+  </nav>
+
+  <main class="main-content">
+    <div class="logo-container">
+      <img src="{{ url_for('static', filename='parker_avenue_logo.png') }}" alt=" " />
     </div>
 
-    <div class="main-content">
-        <div class="logo-container">
-            <img src="{{ url_for('static', filename='../static/parker_avenue_logo.png') }}" alt=" ">
-        </div>
-        <h1>Welcome, Admin!</h1>
-        <p>Here you can view stats and manage parking lots.</p>
-        <a href="{{ url_for('create_lot') }}" class="btn">+ Create New Lot</a>
-        <div class="setting-section">
-            <h3>Logout</h3>
-            <p>Once logged out, you will need to login again to access the admin dashboard.</p>
-            <form action="{{ url_for('logout') }}" method="POST" style="display:inline;">
-                <button class="logout-button" type="submit">Logout</button>
-            </form>
-        </div>
+    <h1>Welcome Back Admin!</h1>
+    <p class="subtext">
+      Here you can easily check stats and manage the parking lots.
+    </p>
 
-        <div class="spot-search-section">
-            <h4>Search Parking Spot Status&Vehicle Details</h4>
-            <form method="POST">
-                <label for="spot_id">Select Parking Spot:</label>
-                <select name="spot_id" id="spot_id" required>
-                    <option value="" disabled selected>Select a spot</option>
-                    {% for spot in spots %}
-                        <option value="{{ spot.id }}"
-                            {% if selected_spot and spot.id == selected_spot.id %}selected{% endif %}>
-                            {{ spot.spot_number }} (Lot: {{ spot.lot.prime_location_name }})
-                        </option>
-                    {% endfor %}
-                </select>
-                <button type="submit" class="btn btn-sm btn-primary">View Status</button>
-            </form>
+    <a href="{{ url_for('create_lot') }}" class="btn">+New Parking Lot</a>
 
-            {% if selected_spot %}
-                <div class="mt-3">
-                    <b>Spot:</b> {{ selected_spot.spot_number }} ({{ selected_spot.lot.prime_location_name }})<br>
-                    <b>Status:</b>
-                    {% if selected_spot.status == 'A' %}
-                        <span class="status-available">Available</span>
-                    {% else %}
-                        <span class="status-occupied">Occupied</span>
-                    {% endif %}
-                    <div class="vehicle-info mt-2">
-                        <b>Vehicle Details (4-wheeler only):</b><br>
-                        Brand: {{ vehicle.brand if vehicle else 'N/A' }}<br>
-                        Model: {{ vehicle.model_name if vehicle else 'N/A' }}<br>
-                        Class: {{ vehicle.vehicle_class if vehicle else 'N/A' }}<br>
-                        Registration: {{ vehicle.registration_number if vehicle else 'N/A' }}<br>
-                    </div>
-                    {% elif selected_spot.status == 'O' %}
-                        <div class="alert alert-warning mt-2">No valid 4-wheeler vehicle info found for this spot.</div>
-                    {% endif %}
-                </div>
-        <h2 style="margin-top: 32px;">Parking Lots</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Location Name</th>
-                    <th>Price/Hour</th>
-                    <th>Address</th>
-                    <th>Pin Code</th>
-                    <th>Max Spots</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% if lots and lots|length > 0 %}
-                    {% for lot in lots %}
-                        <tr>
-                            <td>{{ lot.id }}</td>
-                            <td>{{ lot.prime_location_name }}</td>
-                            <td>₹{{ lot.price_per_hour }}</td>
-                            <td>{{ lot.address }}</td>
-                            <td>{{ lot.pin_code }}</td>
-                            <td>{{ lot.max_spots }}</td>
-                        </tr>
-                    {% endfor %}
-                {% else %}
-                    <tr>
-                        <td colspan="7">No parking lots found.</td>
-                    </tr>
-                {% endif %}
-            </tbody>
-        </table>
-    </div>
+    <section class="setting-section" aria-label="Logout section">
+      <h3>Logout</h3>
+      <p>If you logout, need to login again to access Dashboard!</p>
+      <form action="{{ url_for('logout') }}" method="POST">
+        <button class="btn delete" type="submit">Logout</button>
+      </form>
+    </section>
+
+    <section class="spot-search-section" aria-label="Parking Spot Search">
+      <h4>Look up a spot’s status or see vehicle info:</h4>
+      <form method="POST">
+        <label for="spot_id">Select Parking Spot:</label>
+        <select name="spot_id" id="spot_id" required>
+          <option value="" disabled selected>Select a spot</option>
+          {% for spot in spots %}
+          <option value="{{ spot.id }}" {% if selected_spot and spot.id == selected_spot.id %}selected{% endif %}>
+            {{ spot.spot_number }} (Lot: {{ spot.lot.prime_location_name }})
+          </option>
+          {% endfor %}
+        </select>
+        <button type="submit" class="btn">View Status</button>
+      </form>
+
+      {% if selected_spot %}
+      <div class="vehicle-info" aria-live="polite" tabindex="0">
+        <p><strong>Spot:</strong> {{ selected_spot.spot_number }} ({{ selected_spot.lot.prime_location_name }})</p>
+        <p><strong>Status:</strong>
+          {% if selected_spot.status == 'A' %}
+          <span class="status-available">Available</span>
+          {% else %}
+          <span class="status-occupied">Occupied</span>
+          {% endif %}
+        </p>
+
+        <div class="vehicle-info-details">
+          <strong>Vehicle Details (4-wheeler only):</strong><br />
+          Brand: {{ vehicle.brand if vehicle else 'N/A' }}<br />
+          Model: {{ vehicle.model_name if vehicle else 'N/A' }}<br />
+          Class: {{ vehicle.vehicle_class if vehicle else 'N/A' }}<br />
+          Registration: {{ vehicle.registration_number if vehicle else 'N/A' }}
+        </div>
+      </div>
+      {% elif selected_spot.status == 'O' %}
+      <div class="alert" role="alert" aria-live="assertive">
+        Hmm, we couldn’t find any valid 4-wheeler vehicle info for this spot.
+      </div>
+      {% endif %}
+    </section>
+
+    <h2 style="margin-top: 40px;">Parking Lots</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Location Name</th>
+          <th>Price / Hour</th>
+          <th>Address</th>
+          <th>Pin Code</th>
+          <th>Max Spots</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if lots and lots|length > 0 %}
+        {% for lot in lots %}
+        <tr>
+          <td>{{ lot.id }}</td>
+          <td>{{ lot.prime_location_name }}</td>
+          <td>₹{{ lot.price_per_hour }}</td>
+          <td>{{ lot.address }}</td>
+          <td>{{ lot.pin_code }}</td>
+          <td>{{ lot.max_spots }}</td>
+        </tr>
+        {% endfor %}
+        {% else %}
+        <tr>
+          <td colspan="6">No parking lots found.</td>
+        </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </main>
 </body>
 </html>

@@ -1,146 +1,133 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register</title>
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-        
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f4f8;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-        
-        .container {
-            text-align: center; /* Center the text inside the container */
-        }
-        
-        h2 {
-            margin-bottom: 20px; /* Space between the heading and the form */
-            font-size: 2.5em;
-            color: #ff6347; /* Tomato color */
-            animation: fadeIn 1s ease-in;
-        }
-        
-        #register-form {
-            background: linear-gradient(135deg, #ffffff, #f7f7f7);
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-            width: 100%;
-            max-width: 400px;
-            transition: transform 0.2s;
-            animation: slideIn 0.5s ease-out;
-        }
-        
-        #register-form:hover {
-            transform: scale(1.02);
-        }
-        
-        #register-form input,
-        #register-form button {
-            width: 100%;
-            padding: 12px;
-            margin: 10px 0;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            transition: border-color 0.3s;
-        }
-        
-        #register-form input:focus {
-            border-color: #ff6347; /* Tomato color */
-            outline: none;
-        }
-        
-        #register-form button {
-            background-color: #ff6347; /* Tomato color */
-            color: white;
-            border: none;
-            cursor: pointer;
-            font-weight: bold;
-            transition: background-color 0.3s, transform 0.2s;
-        }
-        
-        #register-form button:hover {
-            background-color: #ff4500; /* Orange Red color */
-            transform: translateY(-2px);
-        }
-        
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
-        }
-        
-        @keyframes slideIn {
-            from {
-                transform: translateY(-20px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-        
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Register</title>
+  <style>
+    *{
+      box-sizing: border-box;
+      margin:0;
+      padding:0;
+    }
+    body{
+      font-family:Arial, sans-serif;
+      background-color: #f0f4f8;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      height:100vh;
+    }
+    .container{
+      text-align:center;
+    }
+    h2{
+      margin-bottom:20px;
+      font-size:2.5em;
+      color: #ff6347;
+      animation:fadeIn 1s ease-in;
+    }
+    #register-form{
+      background:linear-gradient(135deg, #ffffff, #f7f7f7);
+      padding:30px;
+      border-radius:12px;
+      box-shadow:0 8px 20px rgba(0, 0, 0, 0.2);
+      width:100%;
+      max-width:400px;
+      transition:transform 0.2s;
+      animation:slideIn 0.5s ease-out;
+    }
+    #register-form:hover{
+      transform:scale(1.02);
+    }
+    #register-form input,
+    #register-form button,
+    #register-form select{
+      width:100%;
+      padding:12px;
+      margin:10px 0;
+      border:2px solid #ddd;
+      border-radius:8px;
+      transition:border-color 0.3s;
+      font-size:15px;
+    }
+    #register-form input:focus,
+    #register-form select:focus{
+      border-color: #ff6347;
+      outline:none;
+    }
+    #register-form button{
+      background-color: #ff6347;
+      color:white;
+      border:none;
+      font-weight:bold;
+      cursor:pointer;
+      transition:background-color 0.3s, transform 0.2s;
+    }
+    #register-form button:hover{
+      background-color: #ff4500;
+      transform:translateY(-2px);
+    }
+    .dob-label{
+      text-align:left;
+      margin-top:10px;
+      font-size:0.95rem;
+      color:#333;
+      display:block;
+    }
+    @keyframes fadeIn{
+      from{opacity:0;}
+      to{opacity:1;}
+    }
+    @keyframes slideIn{
+      from{transform:translateY(-20px); opacity:0;}
+      to{transform:translateY(0); opacity:1;}
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h2>Create a New Account</h2>
-        <form id="register-form" action="{{ url_for('register_user') }}" method="POST">
-            <input type="text" id="fullname" name="fullname" placeholder="Full Name" required>
-            <input type="text" id="username" name="username" placeholder="Username" required>
-            <input type="email" id="email" name="email" placeholder="Email" required>
-            <input type="password" id="password" name="password" placeholder="Password" required>
-            <label for="dob" class="dob-label">Date of Birth</label>
-            <input type="date" id="dob" name="dob" placeholder="Date of Birth" required>
-            <select id="State" name="State" required class="form-control">  
-                <option value="" disabled selected>Select Your State</option>
-                <option value="Andhra Pradesh">Andhra Pradesh</option>
-                <option value="Arunachal Pradesh">Arunachal Pradesh</option>
-                <option value="Assam">Assam</option>
-                <option value="Bihar">Bihar</option>
-                <option value="Chhattisgarh">Chhattisgarh</option>
-                <option value="Goa">Goa</option>
-                <option value="Gujarat">Gujarat</option>
-                <option value="Haryana">Haryana</option>
-                <option value="Himachal Pradesh">Himachal Pradesh</option>
-                <option value="Jharkhand">Jharkhand</option>
-                <option value="Karnataka">Karnataka</option>
-                <option value="Kerala">Kerala</option>
-                <option value="Madhya Pradesh">Madhya Pradesh</option>
-                <option value="Maharashtra">Maharashtra</option>
-                <option value="Manipur">Manipur</option>
-                <option value="Meghalaya">Meghalaya</option>
-                <option value="Mizoram">Mizoram</option>
-                <option value="Nagaland">Nagaland</option>
-                <option value="Odisha">Odisha</option>
-                <option value="Punjab">Punjab</option>
-                <option value="Rajasthan">Rajasthan</option>
-                <option value="Sikkim">Sikkim</option>
-                <option value="Tamil Nadu">Tamil Nadu</option>
-                <option value="Telangana">Telangana</option>
-                <option value="Tripura">Tripura</option>
-                <option value="Uttarakhand">Uttarakhand</option>
-                <option value="Uttar Pradesh">Uttar Pradesh</option>
-                <option value="West Bengal">West Bengal</option>
-            </select>
-            <button type="submit">Register</button>
-        </form>
-        <a href="{{url_for('user_login')}}" id="redirect-link"></a>
-    </div>
+  <div class="container">
+    <h2>Create a New Account</h2>
+    <form id="register-form" action="{{ url_for('register_user') }}" method="POST">
+      <input type="text" id="fullname" name="fullname" placeholder="Full Name" required />
+      <input type="text" id="username" name="username" placeholder="Username" required />
+      <input type="email" id="email" name="email" placeholder="Email Address" required />
+      <input type="password" id="password" name="password" placeholder="Choose a Password" required />
+      <label for="dob" class="dob-label">Date of Birth</label>
+      <input type="date" id="dob" name="dob" required />
+      <select id="State" name="State" required>
+        <option value="" disabled selected>Select Your State</option>
+        <option value="Andhra Pradesh">Andhra Pradesh</option>
+        <option value="Arunachal Pradesh">Arunachal Pradesh</option>
+        <option value="Assam">Assam</option>
+        <option value="Bihar">Bihar</option>
+        <option value="Chhattisgarh">Chhattisgarh</option>
+        <option value="Goa">Goa</option>
+        <option value="Gujarat">Gujarat</option>
+        <option value="Haryana">Haryana</option>
+        <option value="Himachal Pradesh">Himachal Pradesh</option>
+        <option value="Jharkhand">Jharkhand</option>
+        <option value="Karnataka">Karnataka</option>
+        <option value="Kerala">Kerala</option>
+        <option value="Madhya Pradesh">Madhya Pradesh</option>
+        <option value="Maharashtra">Maharashtra</option>
+        <option value="Manipur">Manipur</option>
+        <option value="Meghalaya">Meghalaya</option>
+        <option value="Mizoram">Mizoram</option>
+        <option value="Nagaland">Nagaland</option>
+        <option value="Odisha">Odisha</option>
+        <option value="Punjab">Punjab</option>
+        <option value="Rajasthan">Rajasthan</option>
+        <option value="Sikkim">Sikkim</option>
+        <option value="Tamil Nadu">Tamil Nadu</option>
+        <option value="Telangana">Telangana</option>
+        <option value="Tripura">Tripura</option>
+        <option value="Uttarakhand">Uttarakhand</option>
+        <option value="Uttar Pradesh">Uttar Pradesh</option>
+        <option value="West Bengal">West Bengal</option>
+      </select>
+      <button type="submit">Register</button>
+    </form>
+  </div>
 </body>
 </html>

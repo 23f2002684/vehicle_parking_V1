@@ -1,187 +1,177 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Parker Avenue</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #e0f7fa, #80deea);
-            color: #333;
-        }
-        header {
-            background-color: #00796b;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-            height: 110px; /* Increased height for logo */
-            display: flex;
-            align-items: center;
-            padding: 0 0 0 0;
-        }
-
-        .header-content {
-            display: flex;
-            align-items: center;
-            width: 100%;
-        }
-
-        .logo-container {
-            height: 110px;
-            width: 150px; /* Adjust width for your logo size */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: transparent;
-        }
-
-        .logo-container img {
-            height: 100px;
-            width: auto;
-            display: block;
-        }
-
-        nav {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        nav ul {
-            list-style-type: none;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        nav ul li {
-            margin: 0 20px;
-        }
-
-        nav ul li a {
-            color: white;
-            text-decoration: none;
-            font-size: 18px;
-            transition: color 0.3s;
-        }
-
-        nav ul li a:hover {
-            color: #ffeb3b;
-        }
-
-        main {
-            flex: 1;
-            padding: 40px 20px;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        .content {
-            background-color: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .content h1, .content h2 {
-            margin-bottom: 20px;
-            text-align: center;
-            color: #00796b;
-        }
-
-        .quote {
-            font-size: 1.2rem;
-            text-align: center;
-            margin: 20px 0;
-            font-style: italic;
-            color: #555;
-        }
-
-        .image-container img {
-            display: block;
-            width: 100%;
-            height: 80%;
-            margin-top: 20px;
-            border-radius: 0 0 10px 10px;
-        }
-
-        footer {
-            background-color: #00796b;
-            color: white;
-            text-align: center;
-            padding: 15px 0;
-        }
-
-        @media screen and (max-width: 768px) {
-            header {
-                height: auto;
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            .header-content {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            .logo-container {
-                width: 100%;
-                justify-content: flex-start;
-                padding-left: 10px;
-            }
-            nav ul {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            nav ul li {
-                margin: 5px 0;
-            }
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Parker Avenue</title>
+  <style>
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+    }
+    body{
+      display:flex;
+      flex-direction:column;
+      min-height:100vh;
+      font-family:Arial, sans-serif;
+      background:linear-gradient(135deg, #e0f7fa, #80deea);
+      color:#333;
+    }
+    header{
+      background-color: #00796b;
+      box-shadow:0 2px 10px rgba(0, 0, 0, 0.2);
+      height:110px;
+      display:flex;
+      align-items:center;
+      padding:0;
+    }
+    .header-content{
+      display:flex;
+      align-items:center;
+      width:100%;
+    }
+    .logo-container{
+      height:110px;
+      width:150px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:transparent;
+    }
+    .logo-container img{
+      height:100px;
+      width:auto;
+      display:block;
+    }
+    nav{
+      flex:1;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    nav ul{
+      list-style-type:none;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+    }
+    nav ul li{
+      margin:0 20px;
+    }
+    nav ul li a{
+      color:white;
+      text-decoration:none;
+      font-size:18px;
+      transition:color 0.3s;
+    }
+    nav ul li a:hover{
+      color: #ffeb3b;
+    }
+    main{
+      flex:1;
+      padding:40px 20px;
+    }
+    .container{
+      max-width:1200px;
+      margin:0 auto;
+      padding:20px;
+    }
+    .content{
+      background-color:white;
+      padding:30px;
+      border-radius:10px;
+      box-shadow:0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+    .content h1,
+    .content h2{
+      margin-bottom:20px;
+      text-align:center;
+      color: #00796b;
+      line-height:1.2;
+    }
+    .quote{
+      font-size:1.2rem;
+      text-align:center;
+      margin:20px 0;
+      font-style:italic;
+      color:#555;
+      max-width:700px;
+      margin-left:auto;
+      margin-right:auto;
+      line-height:1.5;
+    }
+    .image-container img{
+      display:block;
+      width:100%;
+      height:auto;
+      margin-top:20px;
+      border-radius:0 0 10px 10px;
+      object-fit:cover;
+    }
+    footer{
+      background-color: #00796b;
+      color:white;
+      text-align:center;
+      padding:15px 0;
+      font-size:0.95rem;
+      letter-spacing:0.03em;
+    }
+    @media screen and (max-width: 768px){
+      header{
+        height:auto;
+        flex-direction:column;
+        align-items:flex-start;
+      }
+      .header-content{
+        flex-direction:column;
+        align-items:flex-start;
+      }
+      .logo-container{
+        width:100%;
+        justify-content:flex-start;
+        padding-left:10px;
+      }
+      nav ul{
+        flex-direction:column;
+        align-items:flex-start;
+      }
+      nav ul li{
+        margin:5px 0;
+      }
+    }
+  </style>
 </head>
 <body>
-    <header>
-        <div class="header-content">
-            <div class="logo-container">
-                <img src="../static/parker_avenue_logo.png" alt=" ">
-            </div>
-            <nav>
-                <ul>
-                    <li><a href="{{ url_for('home') }}">Home</a></li>
-                    <li><a href="{{ url_for('user_login') }}">User Login</a></li>
-                    <li><a href="{{ url_for('admin_login') }}">Admin Login</a></li>
-                </ul>
-            </nav>
+  <header>
+    <div class="header-content">
+      <div class="logo-container">
+        <img src="../static/parker_avenue_logo.png" alt=" " />
+      </div>
+      <nav>
+        <ul>
+          <li><a href="{{ url_for('home') }}">Home</a></li>
+          <li><a href="{{ url_for('user_login') }}">User Login</a></li>
+          <li><a href="{{ url_for('admin_login') }}">Admin Login</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+  <main>
+    <div class="container">
+      <div class="content">
+        <h1>Welcome to Parker Avenue</h1>
+        <div class="quote">
+          Looking for parking spots? You’ve come to the right place. Parker Avenue helps you find the perfect parking space nearby—whether you're at home, at work, or on vacation. Say GOODBYE to the hassle of hunting for parking and HELLO to convenience!
         </div>
-    </header>
-
-    <main>
-        <div class="container">
-            <div class="content">
-                <h1>Welcome to Parker Avenue!!</h1>
-                <div class="quote">
-                    "Looking for Parking Spots? Look no further! Parker Avenue is here to help you find the perfect parking spot in your area. Whether you're at home, work, or on the go, our platform connects you with available parking spaces nearby. Say goodbye to parking hassles and hello to convenience!"
-                </div>
-                <div class="image-container">
-                    <img src="../static/parking_lot.jpg" alt=" " >
-                </div>
-            </div>
+        <div class="image-container">
+          <img src="../static/parking_lot.jpg" alt=" " />
         </div>
-    </main>
-
-    <footer>
-        <p>&copy; 2025 Parker Avenue | All Rights Reserved</p>
-    </footer>
+      </div>
+    </div>
+  </main>
+  <footer>
+    <p>&copy; 2025 Parker Avenue | All Rights Reserved</p>
+  </footer>
 </body>
 </html>

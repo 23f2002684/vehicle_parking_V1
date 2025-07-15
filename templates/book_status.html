@@ -5,134 +5,129 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Booking Status</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: linear-gradient(135deg, #e0f7fa, #80deea);
-      margin: 0;
-      padding: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
+    body{
+      font-family:Arial, sans-serif;
+      background:linear-gradient(135deg, #e0f7fa, #80deea);
+      margin:0;
+      padding:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      height:100vh;
+      position:relative;
     }
-
-    .status-container {
+    .status-container{
       background-color: #ffffff;
-      padding: 40px;
-      border-radius: 10px;
-      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-      max-width: 500px;
-      text-align: center;
+      padding:40px;
+      border-radius:10px;
+      box-shadow:0 6px 12px rgba(0, 0, 0, 0.1);
+      max-width:500px;
+      text-align:center;
     }
-
-    .status-container h2 {
+    .status-container h2{
       color: #00796b;
-      margin-bottom: 20px;
+      margin-bottom:18px;
+      font-size:1.8em;
     }
-
     .status-message {
-      font-size: 20px;
-      font-weight: bold;
-      padding: 20px;
-      border-radius: 10px;
-      margin-top: 20px;
+      font-size:18px;
+      font-weight:normal;
+      padding:20px;
+      border-radius:10px;
+      margin-top:20px;
+      line-height:1.6;
     }
-
-    .status.pending {
-    background-color: #fffde7;
-    color: #f9a825;
-    border: 2px solid #fbc02d;
-    padding: 6px 14px;
-    border-radius: 6px;
-    font-weight: bold;
-  }
-
-    .status.confirmed {
+    .status.pending{
+      background-color: #fffde7;
+      color: #f9a825;
+      border:2px solid #fbc02d;
+      padding:6px 14px;
+      border-radius:6px;
+      font-weight:bold;
+      display:inline-block;
+      margin-top:20px;
+      font-size:16px;
+    }
+    .status.confirmed{
       background-color: #e8f5e9;
       color: #2e7d32;
-      border: 2px solid #66bb6a;
+      border:2px solid #66bb6a;
     }
-
-    .status.completed {
+    .status.completed{
       background-color: #e3f0fd;
       color: #1565c0;
-      border: 2px solid #2196f3;
+      border:2px solid #2196f3;
     }
-
-    .status.rejected {
+    .status.rejected{
       background-color: #ffebee;
       color: #c62828;
-      border: 2px solid #ef5350;
+      border:2px solid #ef5350;
     }
-    .back-btn {
-      display: inline-block;
-      margin-top: 24px;
-      padding: 10px 22px;
-      background: #00796b;
-      color: #fff;
-      border-radius: 6px;
+    .back-btn{
+      display:inline-block;
+      margin-top:24px;
+      padding:10px 22px;
+      background:#00796b;
+      color:#fff;
+      border-radius:6px;
       text-decoration: none;
       font-size: 16px;
       transition: background 0.2s;
     }
-    .back-btn:hover {
-      background: #004d40;
+    .back-btn:hover{
+      background:#004d40;
     }
-    .logo-container {
-      position: absolute;
-      top: 5px;
-      right: 5px;
-      text-align: right;
+    .logo-container{
+      position:absolute;
+      top:5px;
+      right:5px;
+      text-align:right;
     }
-    .logo-container img {
-      height: 100px;
-      width: 100px;
+    .logo-container img{
+      height:100px;
+      width:100px;
     }
-    @media screen and (max-width: 768px) {
-      .sidebar {
-      width: 200px;
+    @media screen and (max-width: 768px){
+      .logo-container{
+        top:5px;
+        right:5px;
       }
-    .main-content {
-      margin-left: 200px;
-      }
-    .logo-container {
-      top: 5px;
-      right: 5px;
+      .status-container{
+        padding:25px;
       }
     }
   </style>
 </head>
 <body>
   <div class="logo-container">
-            <img src="{{ url_for('static', filename='../static/parker_avenue_logo.png') }}" alt=" ">
-  </div>
+    <img src="{{ url_for('static', filename='parker_avenue_logo.png') }}" alt=" " />
+  </div> 
   <div class="status-container">
-    <h2>Your Booking Status</h2>
-    {% if reservation.status == "Rejected" %}
+    <h2>Booking Status</h2>
+    {% if reservation.status=="Rejected" %}
       <div class="status-message rejected">
-        Sorry, your booking was <strong>REJECTED</strong>.<br>
-        Please try selecting a different time or location.
+        Unfortunately, this booking was <strong>rejected</strong>.<br />
+        Please try a different time or location.
       </div>
-    {% elif reservation.status == "Pending" %}
-      <span class="status pending">Status: Pending</span>
-    {% elif reservation.leaving_timestamp and reservation.leaving_timestamp < now %}
+    {% elif reservation.status=="Pending" %}
+      <div class="status pending">
+        Booking Status: Pending... Please check back later.
+      </div>
+    {% elif reservation.leaving_timestamp and reservation.leaving_timestamp<now %}
       <div class="status-message completed">
-        Your booking at <strong>{{ reservation.spot.lot.prime_location_name }}</strong> is <strong>COMPLETED</strong>.<br>
-        <span>
+        Your booking at <strong>{{ reservation.spot.lot.prime_location_name }}</strong> has been <strong>completed</strong>.<br />
+        <p>
           From <strong>{{ reservation.parking_timestamp.strftime('%d %b %Y, %I:%M %p') }}</strong>
           to <strong>{{ reservation.leaving_timestamp.strftime('%d %b %Y, %I:%M %p') }}</strong>
-        </span>
-        <br>
-        <span>Total Cost: ₹{{ reservation.total_cost }}</span>
+        </p>
+        <p><strong>Total Cost:</strong> ₹{{ reservation.total_cost }}</p>
       </div>
     {% else %}
       <div class="status-message confirmed">
-        Hooray! Your booking is <strong>CONFIRMED</strong>.<br>
-        Location: <strong>{{ reservation.spot.lot.prime_location_name }}</strong><br>
-        Date: <strong>{{ reservation.parking_timestamp.strftime('%d %b %Y') }}</strong><br>
-        Time: <strong>{{ reservation.parking_timestamp.strftime('%I:%M %p') }}</strong>
-        <br>
-        <span>Total Cost: ₹{{ reservation.total_cost }}</span>
+        Your booking is <strong>confirmed</strong> at <strong>{{ reservation.spot.lot.prime_location_name }}</strong>.<br />
+        <p><strong>Date:</strong> {{ reservation.parking_timestamp.strftime('%d %b %Y') }}</p>
+        <p><strong>Time:</strong> {{ reservation.parking_timestamp.strftime('%I:%M %p') }}</p>
+        <p><strong>Total Cost:</strong> ₹{{ reservation.total_cost }}</p>
       </div>
     {% endif %}
     <a href="{{ url_for('user_bookings') }}" class="back-btn">&larr; Back to My Bookings</a>

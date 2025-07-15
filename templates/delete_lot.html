@@ -3,71 +3,91 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Delete Lot</title>
+  <title>Delete a Parking Lot</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family:Arial, sans-serif;
       background-color: #f4f4f9;
-      margin: 0;
-      padding: 0;
+      margin:0;
+      padding:0;
     }
-    .container {
-      width: 50%;
-      margin: auto;
-      padding: 30px;
-      background-color: #fff;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      border-radius: 8px;
-      text-align: center;
+    .container{
+      width:50%;
+      margin:80px auto;
+      padding:30px;
+      background-color:#fff;
+      box-shadow:0 4px 8px rgba(0, 0, 0, 0.1);
+      border-radius:8px;
+      text-align:center;
     }
-    h2 {
+    h2{
       color: #dc3545;
-      margin-bottom: 20px;
+      margin-bottom:20px;
+      font-size:1.8rem;
     }
-    p {
-      font-size: 16px;
-      margin-bottom: 20px;
+    p{
+      font-size:16px;
+      margin-bottom:18px;
     }
-    button {
-      padding: 10px 20px;
-      margin: 5px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
+    .note {
+      color:#333;
+      font-size:15px;
+      margin-bottom:25px;
     }
-    .confirm-btn {
+    button{
+      padding:11px 22px;
+      margin:6px;
+      border:none;
+      border-radius:4px;
+      cursor:pointer;
+      font-size:15px;
+      transition:background-color 0.2s ease;
+    }
+    .confirm-btn{
       background-color: #dc3545;
-      color: white;
+      color:white;
     }
-    .cancel-btn {
+    .confirm-btn:hover{
+      background-color: #b52a35;
+    }
+    .cancel-btn{
       background-color: #6c757d;
-      color: white;
+      color:white;
+    }
+    .cancel-btn:hover{
+      background-color: #585e63;
+    }
+    @media screen and (max-width: 768px){
+      .container{
+        width: 85%;
+        padding: 20px;
+      }
     }
   </style>
 </head>
 <body>
-
   <div class="container">
-    <h2>Confirm Deletion</h2>
-    <p>Are you sure you want to delete the lot: <strong>{{ lot.prime_location_name }}</strong>?</p>
-    <p><strong>Note:</strong> You can only delete this lot if all parking spots are empty.</p>
+    <h2>Delete This Lot?</h2>
+    <p>
+      You're about to delete this lot: <strong>{{ lot.prime_location_name }}</strong>
+    </p>
     <form method="POST" action="{{ url_for('delete_lot', lot_id=lot.id) }}" id="deleteForm">
-      <button type="submit" class="confirm-btn">Yes, Delete Lot</button>
-      <button type="button" class="cancel-btn" onclick="window.location.href='{{ url_for('manage_lots') }}'">Cancel</button>
+      <button type="submit" class="confirm-btn">Yes, Confirm Deletion</button>
+      <button type="button" class="cancel-btn" onclick="window.location.href='{{ url_for('manage_lots') }}'">
+        Cancel, Go Back
+      </button>
     </form>
   </div>
-
   <script>
-    document.getElementById("deleteForm").addEventListener("submit", function(event) {
-      const occupiedSpots = {{ occupied_spots }};
-      if (occupiedSpots > 0) {
-        alert(`Cannot delete. {{ occupied_spots }} spot(s) are still occupied.`);
+    document.getElementById("deleteForm").addEventListener("submit", function(event){
+      const occupiedSpots={{ occupied_spots }};
+      if (occupiedSpots>0) {
+        alert(`Can't proceed. There are still ${occupiedSpots} active spot(s) in this lot.`);
         event.preventDefault();
       } else {
-        alert("Lot deleted successfully!");
+        alert("This lot has been deleted successfully.");
       }
     });
   </script>
-
 </body>
 </html>

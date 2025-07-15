@@ -1,133 +1,138 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Login</title>
-    <style>
-
-        body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #e0f7fa, #80deea); /* Gradient background */
-            margin: 0;
-            padding: 0;
-        }
-
-        .login-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-
-        .login-box {
-            background: #ffffff;
-            padding: 40px;
-            border-radius: 15px;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
-            width: 300px;
-            text-align: center;
-            animation: fadeIn 0.6s ease-in-out;
-        }
-
-        h2 {
-            margin-bottom: 20px;
-            color:rgba(121, 0, 0, 0.73); /* Teal color */
-            font-size: 2em;
-            text-transform: uppercase;
-        }
-
-        .textbox {
-            margin-bottom: 20px;
-        }
-
-        .textbox input {
-            width: 100%;
-            padding: 12px;
-            border: 2px solidrgb(121, 0, 0); /* Teal color */
-            border-radius: 5px;
-            font-size: 16px;
-            box-sizing: border-box;
-            transition: border-color 0.3s, box-shadow 0.3s;
-        }
-
-        .textbox input:focus {
-            border-color: #004d40; /* Darker teal */
-            outline: none;
-            box-shadow: 0 0 5px rgba(0, 121, 107, 0.5);
-        }
-
-        button[type="submit"] {
-            width: 100%;
-            padding: 12px;
-            background-color:rgba(250, 7, 7, 0.69); /* Teal color */
-            border: none;
-            color: white;
-            font-size: 16px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s, transform 0.2s;
-        }
-
-        button[type="submit"]:hover {
-            background-color:rgba(77, 0, 0, 0.46); /* Darker teal */
-            transform: translateY(-2px);
-        }
-
-        .signup {
-            margin-top: 15px;
-            font-size: 14px;
-            color: #555;
-        }
-
-        .signup a {
-            color:rgb(121, 4, 0); /* Teal color */
-            text-decoration: none;
-            transition: color 0.3s;
-        }
-
-        .signup a:hover {
-            color:rgb(221, 39, 39); /* Darker teal */
-            text-decoration: underline;
-        }
-
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Login</title>
+  <style>
+    body{
+      font-family:'Arial', sans-serif;
+      background:linear-gradient(135deg, #e0f7fa, #80deea);
+      margin:0;
+      padding:0;
+    }
+    .login-container{
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      height:100vh;
+    }
+    .login-box{
+      background:#ffffff;
+      padding:40px;
+      border-radius:15px;
+      box-shadow:0 8px 30px rgba(0, 0, 0, 0.1);
+      width:300px;
+      text-align:center;
+      animation:fadeIn 0.6s ease-in-out;
+    }
+    h2{
+      margin-bottom:20px;
+      color:rgba(121, 0, 0, 0.73);
+      font-size:2em;
+      text-transform:uppercase;
+    }
+    .textbox {
+      margin-bottom:20px;
+    }
+    .textbox input {
+      width:100%;
+      padding:12px;
+      border:2px solid rgb(121, 0, 0);
+      border-radius:5px;
+      font-size:16px;
+      box-sizing:border-box;
+      transition:border-color 0.3s, box-shadow 0.3s;
+    }
+    .textbox input:focus{
+      border-color:#004d40;
+      outline:none;
+      box-shadow:0 0 5px rgba(0, 121, 107, 0.5);
+    }
+    button[type='submit']{
+      width:100%;
+      padding:12px;
+      background-color:rgba(250, 7, 7, 0.69);
+      border:none;
+      color:white;
+      font-size:16px;
+      border-radius:5px;
+      cursor:pointer;
+      transition:background-color 0.3s, transform 0.2s;
+    }
+    button[type='submit']:hover{
+      background-color: rgba(77, 0, 0, 0.46);
+      transform:translateY(-2px);
+    }
+    .note{
+      font-size:14px;
+      color:#555;
+      margin-bottom:18px;
+    }
+    .note a{
+      color: rgb(121, 4, 0);
+      text-decoration:none;
+      transition:color 0.3s;
+    }
+    .note a:hover{
+      color: rgb(221, 39, 39);
+      text-decoration:underline;
+    }
+    .alert-container{
+      margin-bottom:16px;
+      text-align:left;
+    }
+    .alert{
+      padding:10px;
+      border-radius:4px;
+      font-size:14px;
+      margin-bottom:10px;
+    }
+    .alert-success{
+      background-color: #e8f5e9;
+      color:#2e7d32;
+    }
+    .alert-error{
+      background-color:#ffebee;
+      color:#b71c1c;
+    }
+    @keyframes fadeIn{
+      from{
+        opacity:0;
+        transform:translateY(-20px);
+      }
+      to{
+        opacity:1;
+        transform:translateY(0);
+      }
+    }
+  </style>
 </head>
 <body>
-    <div class="login-container">
-        <div class="login-box">
-            <h2>Login as Admin</h2>
-            {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
-                    <div class="alert-container">
-                        {% for category, message in messages %}
-                            <div class="alert alert-{{ category }}">{{ message }}</div>
-                        {% endfor %}
-                    </div>
-                {% endif %}
-            {% endwith %}
-            <p>Note: This is only for admin login. If you are a user, please go to the <a href="{{ url_for('user_login') }}">User Login</a> page.</p>
-            <form action="{{ url_for('admin_login') }}" method="POST">
-                <div class="textbox">
-                    <input type="text" placeholder="Username" name="username" required>
-                </div>
-                <div class="textbox">
-                    <input type="password" placeholder="Password" name="password" required>
-                </div>
-                <button type="submit" class="btn">Login</button>
-            </form>
+  <div class="login-container">
+    <div class="login-box">
+      <h2>Admin Login</h2>
+      {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+      <div class="alert-container">
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }}">{{ message }}</div>
+        {% endfor %}
+      </div>
+      {% endif %}
+      {% endwith %}
+      <p class="note">
+        This is only for administrator login. If an user, please visit the <a href="{{ url_for('user_login') }}">user login</a> page.</p>
+      <form action="{{ url_for('admin_login') }}" method="POST">
+        <div class="textbox">
+          <input type="text" name="username" placeholder="Enter your username" required />
         </div>
+        <div class="textbox">
+          <input type="password" name="password" placeholder="Enter your password" required />
+        </div>
+        <button type="submit">Login</button>
+      </form>
     </div>
+  </div>
 </body>
 </html>

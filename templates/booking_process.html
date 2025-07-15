@@ -5,173 +5,156 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Book a Parking Spot</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: linear-gradient(135deg, #e0f7fa, #80deea);
-      margin: 0;
-      padding: 0;
+    body{
+      font-family:Arial, sans-serif;
+      background:linear-gradient(135deg, #e0f7fa, #80deea);
+      margin:0;
+      padding:0;
     }
-
-    .booking-container {
-      max-width: 700px;
-      margin: 50px auto;
+    .booking-container{
+      max-width:700px;
+      margin:50px auto;
       background-color: #ffffff;
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+      padding:30px;
+      border-radius:10px;
+      box-shadow:0 6px 12px rgba(0, 0, 0, 0.1);
     }
-
-    h2 {
-      text-align: center;
+    h2{
+      text-align:center;
       color: #00796b;
-      margin-bottom: 10px;
+      margin-bottom:10px;
     }
-
-    p {
-      text-align: center;
-      color: #555;
-      margin-bottom: 20px;
+    p{
+      text-align:center;
+      color:#555;
+      margin-bottom:20px;
+      font-size:1rem;
     }
-
-    form label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: bold;
-      color: #333;
+    form label{
+      display:block;
+      margin-bottom:8px;
+      font-weight:bold;
+      color:#333;
     }
-
     form select,
     form input[type="date"],
-    form input[type="time"] {
-      width: 100%;
-      padding: 10px;
-      margin-bottom: 20px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      font-size: 16px;
+    form input[type="time"],
+    form input[type="text"],
+    form input[type="datetime-local"] 
+    {
+      width:100%;
+      padding:10px;
+      margin-bottom:20px;
+      border:1px solid #ccc;
+      border-radius:6px;
+      font-size:16px;
     }
-
-    .form-buttons {
-      display: flex;
-      gap: 12px;
+    .form-buttons{
+      display:flex;
+      gap:12px;
     }
-
     .form-buttons a,
-    .form-buttons button {
-      width: 50%;
+    .form-buttons button{
+      width:50%;
       background-color: #00796b;
-      color: white;
-      border: none;
-      padding: 12px;
-      font-size: 16px;
-      border-radius: 6px;
-      cursor: pointer;
-      text-align: center;
-      text-decoration: none;
-      display: inline-block;
-      transition: background-color 0.3s;
+      color:white;
+      border:none;
+      padding:12px;
+      font-size:16px;
+      border-radius:6px;
+      cursor:pointer;
+      text-align:center;
+      text-decoration:none;
+      display:inline-block;
+      transition:background-color 0.3s;
     }
-
     .form-buttons a:hover,
-    .form-buttons button:hover {
+    .form-buttons button:hover{
       background-color: #004d40;
     }
   </style>
 </head>
 <body>
-
 <div class="booking-container">
-  <h2>Book a Parking Spot</h2>
-  <p>Select your preferred location, date, and time</p>
-
+  <h2>Book Your Parking Spot</h2>
+  <p>Choose your preferred location, date, and time to start your reservation.</p>
   <form id="booking-form" action="{{ url_for('booking_process') }}" method="POST">
-    <label for="location">Select Location</label>
+    <label for="location">Location</label>
     <select id="location" name="location" required>
-      <option value="">Loading locations...</option>
+      <option value="">Loading available locations...</option>
     </select>
-
-    <label for="date">Booking Date</label>
+    <label for="date">Date</label>
     <input type="date" id="date" name="date" required />
-
-    <label for="parking_timestamp">Parking Start</label>
+    <label for="parking_timestamp">Start Time</label>
     <input type="datetime-local" id="parking_timestamp" name="parking_timestamp" required>
-
-    <label for="leaving_timestamp">Parking End</label>
+    <label for="leaving_timestamp">End Time</label>
     <input type="datetime-local" id="leaving_timestamp" name="leaving_timestamp" required>
-
     <label for="vehicle_brand">Vehicle Brand</label>
-<input type="text" id="vehicle_brand" name="vehicle_brand" required />
-
-<label for="vehicle_model">Model Name</label>
-<input type="text" id="vehicle_model" name="vehicle_model" required />
-
-<label for="vehicle_class">Vehicle Class</label>
-<select id="vehicle_class" name="vehicle_class" required>
-  <option value="" disabled selected>Select class</option>
-  <option value="SUV">SUV</option>
-  <option value="Sedan">Sedan</option>
-  <option value="Hatchback">Hatchback</option>
-  <option value="MPV">MPV</option>
-  <option value="Convertible">Convertible</option>
-  <option value="Coupe">Coupe</option>
-  <option value="Wagon">Wagon</option>
-  <option value="Mini Coupe">Mini Coupe</option>
-  <option value="Pickup">Pickup</option>
-</select>
-
-<label for="vehicle_reg_no">Registration Number</label>
-<input type="text" id="vehicle_reg_no" name="vehicle_reg_no" required />
-
+    <input type="text" id="vehicle_brand" name="vehicle_brand" required />
+    <label for="vehicle_model">Model</label>
+    <input type="text" id="vehicle_model" name="vehicle_model" required />
+    <label for="vehicle_class">Vehicle Type</label>
+    <select id="vehicle_class" name="vehicle_class" required>
+      <option value="" disabled selected>Select type</option>
+      <option value="SUV">SUV</option>
+      <option value="Sedan">Sedan</option>
+      <option value="Hatchback">Hatchback</option>
+      <option value="MPV">MPV</option>
+      <option value="Convertible">Convertible</option>
+      <option value="Coupe">Coupe</option>
+      <option value="Wagon">Wagon</option>
+      <option value="Mini Coupe">Mini Coupe</option>
+      <option value="Pickup">Pickup</option>
+    </select>
+    <label for="vehicle_reg_no">Registration No.</label>
+    <input type="text" id="vehicle_reg_no" name="vehicle_reg_no" required />
     <div class="form-buttons">
-      <a href="lot_details.html" id="view-details-link">View Details</a>
+      <a href="lot_details.html" id="view-details-link">View Lot Info</a>
       <button type="submit">Confirm Booking</button>
     </div>
   </form>
 </div>
-
 <script>
-  document.addEventListener("DOMContentLoaded", function() {
-    const locationDropdown = document.getElementById("location");
-    const viewDetailsLink = document.getElementById("view-details-link");
+  document.addEventListener("DOMContentLoaded", function(){
+    const locationDropdown=document.getElementById("location");
+    const viewDetailsLink=document.getElementById("view-details-link");
     fetch("/lots")
-      .then(response => response.json())
-      .then(data => {
-        locationDropdown.innerHTML = '<option value="" disabled selected>Select a location</option>';
-        data.forEach(loc => {
-          const option = document.createElement("option");
-          option.value = loc.id;
-          option.textContent = loc.name;
+      .then(response=>response.json())
+      .then(data=>{
+        locationDropdown.innerHTML='<option value=" " disabled selected>Select a location</option>';
+        data.forEach(loc=>{
+          const option=document.createElement("option");
+          option.value=loc.id;
+          option.textContent=loc.name;
           locationDropdown.appendChild(option);
         });
       })
-      .catch(error => {
-        console.error("Failed to fetch locations:", error);
-        locationDropdown.innerHTML = "<option>Error loading locations</option>";
+      .catch(error=>{
+        console.error("Unable to load locations:", error);
+        locationDropdown.innerHTML="<option>Error loading locations</option>";
       });
     viewDetailsLink.setAttribute("aria-disabled", "true");
-    viewDetailsLink.style.pointerEvents = "none";
-    viewDetailsLink.style.opacity = "0.6";
-    locationDropdown.addEventListener("change", function() {
-      const selectedLot = locationDropdown.value;
-      if (selectedLot) {
-        viewDetailsLink.href = `/lot_details/${encodeURIComponent(selectedLot)}`;
+    viewDetailsLink.style.pointerEvents="none";
+    viewDetailsLink.style.opacity="0.6";
+    locationDropdown.addEventListener("change", function(){
+      const selectedLot=locationDropdown.value;
+      if (selectedLot){
+        viewDetailsLink.href=`/lot_details/${encodeURIComponent(selectedLot)}`;
         viewDetailsLink.removeAttribute("aria-disabled");
-        viewDetailsLink.style.pointerEvents = "auto";
-        viewDetailsLink.style.opacity = "1";
-      } else {
-        viewDetailsLink.href = "#";
+        viewDetailsLink.style.pointerEvents="auto";
+        viewDetailsLink.style.opacity="1";
+      } else{
+        viewDetailsLink.href="#";
         viewDetailsLink.setAttribute("aria-disabled", "true");
-        viewDetailsLink.style.pointerEvents = "none";
-        viewDetailsLink.style.opacity = "0.6";
+        viewDetailsLink.style.pointerEvents="none";
+        viewDetailsLink.style.opacity="0.6";
       }
     });
-
-    document.getElementById("booking-form").addEventListener("submit", function(e) {
-      const confirmBooking = confirm("Confirm your booking?");
-      if (!confirmBooking) e.preventDefault();
+    document.getElementById("booking-form").addEventListener("submit", function(e){
+      const confirmBooking=confirm("Confirm your booking?");
+      if (!confirmBooking)e.preventDefault();
     });
   });
 </script>
-
 </body>
 </html>

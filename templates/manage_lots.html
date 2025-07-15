@@ -1,215 +1,217 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Lots</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            margin: 0;
-        }
-        .sidebar {
-            width: 250px;
-            background-color: #2f3b52;
-            color: #fff;
-            padding-top: 20px;
-            height: 100vh;
-            position: fixed;
-        }
-        .sidebar h2 {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .sidebar a {
-            color: white;
-            padding: 15px;
-            text-decoration: none;
-            display: block;
-            font-size: 18px;
-        }
-        .sidebar a:hover {
-            background-color: #1e2a38;
-        }
-        .main-content {
-            margin-left: 250px;
-            padding: 20px;
-            width: 100%;
-        }
-        .main-content h1 {
-            font-size: 24px;
-            color: #333;
-        }
-        .btn {
-            background-color: #00796b;
-            color: white;
-            border: none;
-            padding: 10px 18px;
-            border-radius: 5px;
-            text-decoration: none;
-            font-size: 16px;
-            margin-right: 8px;
-            transition: background 0.2s;
-            cursor: pointer;
-        }
-        .btn:hover {
-            background-color: #004d40;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 18px;
-        }
-        th, td {
-            padding: 10px 8px;
-            border-bottom: 1px solid #ddd;
-            text-align: left;
-        }
-        th {
-            background: #f0f4f8;
-        }
-        .logo-container {
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            text-align: right;
-        }
-        td .action-buttons {
-            display: flex;
-            gap: 8px; 
-            flex-wrap: wrap;
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Manage Lots</title>
+  <style>
+    body{
+      font-family:Arial, sans-serif;
+      display:flex;
+      margin:0;
     }
-
-    td .action-buttons .btn {
-        min-width: 70px;
-        margin-right: 0;
-        margin-bottom: 0;
-        white-space: nowrap;
+    .sidebar{
+      width:250px;
+      background-color: #2f3b52;
+      color:#fff;
+      padding-top:20px;
+      height:100vh;
+      position:fixed;
     }
-        .logo-container img {
-            height: 90px;
-            width: 90px;
-        }
-        .chart-section {
-            margin-left: 100px;
-            padding: 20px 20px 40px 20px;
-            width: calc(100% - 250px);
-        }
-        @media screen and (max-width: 768px) {
-            .sidebar {
-                width: 200px;
-            }
-            .main-content {
-                margin-left: 200px;
-            }
-            .logo-container {
-                top: 5px;
-                right: 5px;
-            }
-            td .action-buttons {
-            flex-direction: column;
-            gap: 6px;
-            align-items: flex-start;
-            }
-        }
-    </style>
+    .sidebar h2{
+      text-align:center;
+      margin-bottom:20px;
+    }
+    .sidebar a{
+      color:white;
+      padding:15px;
+      text-decoration:none;
+      display:block;
+      font-size:18px;
+    }
+    .sidebar a:hover{
+      background-color: #1e2a38;
+    }
+    .main-content{
+      margin-left:250px;
+      padding:20px;
+      width:100%;
+    }
+    .main-content h1{
+      font-size:24px;
+      color:#333;
+    }
+    .main-content p{
+      margin-top:8px;
+      font-size:15px;
+      color:#666;
+    }
+    .btn {
+      background-color: #00796b;
+      color:white;
+      border:none;
+      padding:10px 18px;
+      border-radius:5px;
+      text-decoration:none;
+      font-size:16px;
+      margin-right:8px;
+      transition:background 0.2s;
+      cursor:pointer;
+    }
+    .btn:hover{
+      background-color: #004d40;
+    }
+    table{
+      width:100%;
+      border-collapse:collapse;
+      margin-top:18px;
+    }
+    th, td{
+      padding:10px 8px;
+      border-bottom:1px solid #ddd;
+      text-align:left;
+    }
+    th{
+      background: #f0f4f8;
+    }
+    td .action-buttons{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+    td .action-buttons .btn{
+      min-width:70px;
+      margin-right:0;
+      margin-bottom:0;
+      white-space:nowrap;
+    }
+    .logo-container{
+      position:absolute;
+      top:5px;
+      right:5px;
+      text-align:right;
+    }
+    .logo-container img{
+      height:90px;
+      width:90px;
+    }
+    .chart-section{
+      margin-left:100px;
+      padding:20px 20px 40px 20px;
+      width:calc(100% - 250px);
+    }
+    @media screen and (max-width: 768px){
+      .sidebar{
+        width:200px;
+      }
+      .main-content{
+        margin-left:200px;
+      }
+      .logo-container{
+        top:5px;
+        right:5px;
+      }
+      td .action-buttons{
+        flex-direction:column;
+        gap:6px;
+        align-items:flex-start;
+      }
+    }
+  </style>
 </head>
 <body>
-    <div class="sidebar">
-        <h2>Admin Dashboard</h2>
-        <a href="{{ url_for('admin_dashboard') }}">Dashboard</a>
-        <a href="{{ url_for('manage_users') }}">Manage Users</a>
-        <a href="{{ url_for('manage_lots') }}">Manage Lots</a>
-        <a href="{{ url_for('receipts') }}">Receipts</a>
+  <div class="sidebar">
+    <h2>Admin Dashboard</h2>
+    <a href="{{ url_for('admin_dashboard') }}">Dashboard</a>
+    <a href="{{ url_for('manage_users') }}">Manage Users</a>
+    <a href="{{ url_for('manage_lots') }}">Manage Lots</a>
+    <a href="{{ url_for('receipts') }}">Receipts</a>
+  </div>
+  <div class="main-content">
+    <div class="logo-container">
+      <img src="{{ url_for('static', filename='../static/parker_avenue_logo.png') }}" alt=" " />
     </div>
+    <h1>Manage Parking Lots</h1>
+    <p>Admin can edit/delete parking lots as well as view their details.</p>
+    <table id="lots-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Location Name</th>
+          <th>Price/Hour</th>
+          <th>Address</th>
+          <th>Pin Code</th>
+          <th>Max Spots</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for lot in lots %}
+        <tr>
+          <td>{{ lot.id }}</td>
+          <td>{{ lot.prime_location_name }}</td>
+          <td>₹{{ lot.price_per_hour }}</td>
+          <td>{{ lot.address }}</td>
+          <td>{{ lot.pin_code }}</td>
+          <td>{{ lot.max_spots }}</td>
+          <td>
+            <div class="action-buttons">
+              <a href="{{ url_for('edit_lot', lot_id=lot.id) }}" class="btn">Edit</a>
+              <a href="{{ url_for('delete_lot', lot_id=lot.id) }}" class="btn" style="background: #d32f2f;">Delete</a>
+            </div>
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="7">No lots available. You can create one from the dashboard.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
 
-    <div class="main-content">
-        <div class="logo-container">
-            <img src="{{ url_for('static', filename='../static/parker_avenue_logo.png') }}" alt=" ">
-        </div>
-        <h1>Manage Lots</h1>
-        <p>Here you can create, edit, or delete parking lots.</p>
-        <table id="lots-table">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Location Name</th>
-                    <th>Price/Hour</th>
-                    <th>Address</th>
-                    <th>Pin Code</th>
-                    <th>Max Spots</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for lot in lots %}
-                <tr>
-                    <td>{{ lot.id }}</td>
-                    <td>{{ lot.prime_location_name }}</td>
-                    <td>₹{{ lot.price_per_hour }}</td>
-                    <td>{{ lot.address }}</td>
-                    <td>{{ lot.pin_code }}</td>
-                    <td>{{ lot.max_spots }}</td>
-                    <td>
-                        <div class="action-buttons">
-                        <a href="{{ url_for('edit_lot', lot_id=lot.id) }}" class="btn">Edit</a>
-                        <a href="{{ url_for('delete_lot', lot_id=lot.id) }}" class="btn" style="background:#d32f2f;">Delete</a>
-                        </div>
-                    </td>
-                </tr>
-                {% else %}
-                <tr>
-                    <td colspan="7">No parking lots found.</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-    <br>
-    <div class="chart-section">
-        <h3>Parking Lot Spot Summary</h3>
-        <canvas id="lotSpotsChart" width="600" height="800"></canvas>
-        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    </div>
-    <script>
+  <div class="chart-section">
+    <h3>Lotwise Spots Summary</h3>
+    <canvas id="lotSpotsChart" width="600" height="800"></canvas>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  </div>
+  <script>
     const adminLotNames = {{ lot_names|tojson }};
     const adminMaxSpots = {{ max_spots|tojson }};
     const adminOccupied = {{ occupied_count|tojson }};
     const adminAvailable = {{ available_count|tojson }};
-
     new Chart(document.getElementById('lotSpotsChart').getContext('2d'), {
-        type: 'bar',
-        data: {
-            labels: adminLotNames,
-            datasets: [
-                {
-                    label: 'Total Spots',
-                    data: adminMaxSpots,
-                    backgroundColor: 'rgba(54, 162, 235, 0.7)'
-                },
-                {
-                    label: 'Occupied Spots',
-                    data: adminOccupied,
-                    backgroundColor: 'rgba(255, 99, 132, 0.7)'
-                },
-                {
-                    label: 'Available Spots',
-                    data: adminAvailable,
-                    backgroundColor: 'rgba(75, 192, 192, 0.7)'
-                }
-            ]
+      type: 'bar',
+      data: {
+        labels:adminLotNames,
+        datasets:[
+          {
+            label:'Total Spots',
+            data:adminMaxSpots,
+            backgroundColor: 'rgba(54, 162, 235, 0.7)'
+          },
+          {
+            label:'Occupied Spots',
+            data:adminOccupied,
+            backgroundColor: 'rgba(255, 99, 132, 0.7)'
+          },
+          {
+            label:'Available Spots',
+            data:adminAvailable,
+            backgroundColor: 'rgba(75, 192, 192, 0.7)'
+          }
+        ]
+      },
+      options:{
+        responsive:true,
+        plugins:{
+          legend:{ position: 'top' }
         },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: { position: 'top' }
-            },
-            scales: {
-                y: { beginAtZero: true }
-            }
+        scales:{
+          y:{ beginAtZero: true }
         }
+      }
     });
-    </script>
+  </script>
 </body>
 </html>
