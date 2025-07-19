@@ -1,0 +1,209 @@
+openapi: 3.0.4
+info:
+  title: Vehicle Parking App API
+  version: "1.0.0"
+  description: API for managing users, bookings, vehicles, and parking lots using Flask + SQLite backend.
+
+servers:
+  - url: http://localhost:5000
+
+paths:
+  /register_user:
+    post:
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required: [fullname, username, email, password, dob, State]
+              properties:
+                fullname: { type: string }
+                username: { type: string }
+                email: { type: string }
+                password: { type: string }
+                dob: { type: string, format: date }
+                State: { type: string }
+      responses:
+        '302':
+          description: Redirect with success or error flash message
+
+  /user_login:
+    post:
+      summary: User login
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required: [username, password]
+              properties:
+                username: { type: string }
+                password: { type: string }
+      responses:
+        '302':
+          description: Redirect on success or failure
+
+  /booking_process:
+    post:
+      summary: Book a parking spot
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required:
+                [location, parking_timestamp, leaving_timestamp,
+                 vehicle_brand, vehicle_model, vehicle_class, vehicle_reg_no]
+              properties:
+                location: { type: string }
+                parking_timestamp: { type: string, format: date-time }
+                leaving_timestamp: { type: string, format: date-time }
+                vehicle_brand: { type: string }
+                vehicle_model: { type: string }
+                vehicle_class: { type: string }
+                vehicle_reg_no: { type: string }
+      responses:
+        '302':
+          description: Redirects to booking status
+
+  /user_bookings:
+    get:
+      summary: Get all bookings for the current user
+      responses:
+        '200':
+          description: Renders booking summary and charts
+  
+  /cancel_booking/{booking_id}:
+    post:
+      summary: Cancel an active booking
+      parameters:
+        - in: path
+          name: booking_id
+          required: true
+          schema: { type: integer }
+      responses:
+        '302':
+          description: Booking marked as cancelled
+  
+  /settings:
+    get:
+      summary: Display user's settings page
+      responses:
+        '200':
+          description: Shows dark mode toggle, profile, and delete options
+
+  /change_password:
+    post:
+      summary: User requests password change
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required: [current_password, new_password, confirm_password]
+              properties:
+                current_password: { type: string }
+                new_password: { type: string }
+                confirm_password: { type: string }
+      responses:
+        '302':
+          description: Password updated or error flashed
+
+  /delete_account:
+    post:
+      summary: Permanently delete a user account
+      responses:
+        '302':
+          description: Account deleted and redirected
+
+  /create_lot:
+    post:
+      summary: Admin creates a new parking lot
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required: [prime_location_name, price_per_hour, address, pin_code, max_spots]
+              properties:
+                prime_location_name: { type: string }
+                price_per_hour: { type: number }
+                address: { type: string }
+                pin_code: { type: string }
+                max_spots: { type: integer }
+      responses:
+        '302':
+          description: Lot added successfully
+
+  /edit_lot/{lot_id}:
+    post:
+      summary: Admin edits a parking lot
+      parameters:
+        - name: lot_id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                prime_location_name: { type: string }
+                price_per_hour: { type: number }
+                address: { type: string }
+                pin_code: { type: string }
+                max_spots: { type: integer }
+      responses:
+        '302':
+          description: Updated and redirected
+
+  /delete_lot/{lot_id}:
+    post:
+      summary: Delete a parking lot (admin-only if spots are not occupied)
+      parameters:
+        - name: lot_id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        '302':
+          description: Lot deleted or error flashed
+
+  /receipts:
+    get:
+      summary: Admin - View all printed parking receipts
+      responses:
+        '200':
+          description: Render formatted receipts table
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id: { type: integer }
+        username: { type: string }
+        fullname: { type: string }
+        email: { type: string }
+        dob: { type: string, format: date }
+        state: { type: string }
+
+    ParkingLot:
+      type: object
+      properties:
+        id: { type: integer }
+        prime_location_name: { type: string }
+        address: { type: string }
+        pin_code: { type: string }
+        price_per_hour: { type: number }
+        max_spots: { type: integer }
+        available_spots: { type: integer }
+
